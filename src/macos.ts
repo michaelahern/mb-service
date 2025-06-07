@@ -127,6 +127,11 @@ export class MacPlatform extends PlatformCommands {
         this.start();
     }
 
+    tail(): void {
+        const storagePath = resolve(this.#getUserInfo().homedir, '.matterbridge');
+        execFileSync('tail', ['-f', `${storagePath}/matterbridge.log`], { stdio: 'inherit' });
+    }
+
     #checkRoot() {
         if (!process.getuid || process.getuid() !== 0) {
             console.error('Must run as sudo!');
@@ -136,7 +141,6 @@ export class MacPlatform extends PlatformCommands {
     }
 
     #getUserInfo(): UserInfo<string> {
-        this.#checkRoot();
         if (process.env.SUDO_USER && process.env.SUDO_UID && process.env.SUDO_GID) {
             return {
                 username: process.env.SUDO_USER,

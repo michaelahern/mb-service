@@ -30,4 +30,9 @@ export class LinuxPlatform extends PlatformCommands {
         console.error('Platform not implemented yet.');
         process.exit(1);
     }
+
+    tail(): void {
+        console.error('Platform not implemented yet.');
+        process.exit(1);
+    }
 }

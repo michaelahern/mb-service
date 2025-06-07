@@ -46,6 +46,9 @@ async function main() {
         case 'restart':
             platformCommands.restart();
             break;
+        case 'tail':
+            platformCommands.tail();
+            break;
         case undefined:
             help();
             break;
@@ -63,6 +66,7 @@ function help() {
     console.log('  start         Start the Matterbridge service');
     console.log('  stop          Stop the Matterbridge service');
     console.log('  restart       Restart the Matterbridge service');
+    console.log('  tail          Tail the Matterbridge log file');
 }
 
 main().catch(err => console.error(err));
