@@ -9,6 +9,10 @@ import { PlatformCommands } from './platform.js';
 export class MacPlatform extends PlatformCommands {
     #plist = '/Library/LaunchDaemons/com.matterbridge.plist';
 
+    isInstalled(): boolean {
+        return existsSync(this.#plist);
+    }
+
     install(): void {
         this.#checkRoot();
         const userInfo = this.#getUserInfo();
@@ -75,10 +79,6 @@ export class MacPlatform extends PlatformCommands {
         console.info('Matterbridge Service Uninstalled!');
     }
 
-    isInstalled(): boolean {
-        return existsSync(this.#plist);
-    }
-
     isRunning(): boolean {
         try {
             execFileSync('launchctl', ['print', 'system/com.matterbridge'], { stdio: 'ignore' });
@@ -125,6 +125,20 @@ export class MacPlatform extends PlatformCommands {
     restart(): void {
         this.stop();
         this.start();
+    }
+
+    pid(): string | null {
+        try {
+            const output = execFileSync('launchctl', ['print', 'system/com.matterbridge']).toString();
+            const match = output.match(/pid = (\d+)/);
+            if (match) {
+                return match[1];
+            }
+            return null;
+        }
+        catch {
+            return null;
+        }
     }
 
     tail(): void {

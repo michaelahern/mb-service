@@ -46,6 +46,14 @@ async function main() {
         case 'restart':
             platformCommands.restart();
             break;
+        case 'pid': {
+            const pid = platformCommands.pid();
+            if (pid === null) {
+                process.exit(1);
+            }
+            console.log(pid);
+            break;
+        }
         case 'tail':
             platformCommands.tail();
             break;

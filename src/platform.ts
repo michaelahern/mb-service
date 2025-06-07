@@ -5,5 +5,6 @@ export abstract class PlatformCommands {
     abstract start(): void;
     abstract stop(): void;
     abstract restart(): void;
+    abstract pid(): string | null;
     abstract tail(): void;
 }
