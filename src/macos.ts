@@ -50,6 +50,8 @@ export class MacOS extends Platform {
             '    <dict>',
             '        <key>HOME</key>',
             `        <string>${userInfo.homedir}</string>`,
+            '        <key>PATH</key>',
+            `        <string>${process.env.PATH}</string>`,
             '    </dict>',
             '</dict>',
             '</plist>'
