@@ -63,6 +63,7 @@ export class MacOS extends Platform {
         ].filter(x => x).join('\n');
 
         writeFileSync(this.#plist, plistFileContents);
+        console.info('Matterbridge Service Installed!');
         this.start();
         // Post Install Console
     }
@@ -70,13 +71,12 @@ export class MacOS extends Platform {
     uninstall(): void {
         this.#checkRoot();
         this.stop();
-        if (existsSync(this.#plist)) {
-            unlinkSync(this.#plist);
-            console.info('Matterbridge Service Uninstalled!');
-        }
-        else {
-            console.info('Matterbridge Service Not Installed...');
-        }
+        unlinkSync(this.#plist);
+        console.info('Matterbridge Service Uninstalled!');
+    }
+
+    isInstalled(): boolean {
+        return existsSync(this.#plist);
     }
 
     isRunning(): boolean {
@@ -92,26 +92,34 @@ export class MacOS extends Platform {
     start(): void {
         this.#checkRoot();
 
+        if (!this.isInstalled()) {
+            console.error('Matterbridge Service Not Installed!');
+            console.error('sudo mb-service install');
+            process.exit(1);
+        }
+
         if (this.isRunning()) {
-            console.warn('Matterbridge already running!');
+            console.warn('Matterbridge Service Already Running!');
             return;
         }
 
-        console.info('Starting Matterbridge...');
-        // execFileSync('launchctl', ['enable', 'system/com.matterbridge']);
+        console.info('Starting Matterbridge Service...');
         execFileSync('launchctl', ['bootstrap', 'system', this.#plist]);
     }
 
     stop(): void {
         this.#checkRoot();
 
-        if (!this.isRunning()) {
-            console.warn('Matterbridge is not running!');
-            return;
+        if (!this.isInstalled()) {
+            console.error('Matterbridge Service Not Installed!');
+            console.error('sudo mb-service install');
+            process.exit(1);
         }
 
-        console.info('Stopping Matterbridge...');
-        execFileSync('launchctl', ['bootout', 'system/com.matterbridge']);
+        if (this.isRunning()) {
+            console.info('Stopping Matterbridge Service...');
+            execFileSync('launchctl', ['bootout', 'system/com.matterbridge']);
+        }
     }
 
     restart(): void {
@@ -121,8 +129,8 @@ export class MacOS extends Platform {
 
     #checkRoot() {
         if (!process.getuid || process.getuid() !== 0) {
-            console.error('Run as sudo or root user!');
-            console.error(`sudo mb-service <command>`);
+            console.error('Must run as sudo!');
+            console.error(`sudo mb-service ${process.argv[2]}`);
             process.exit(1);
         }
     }
