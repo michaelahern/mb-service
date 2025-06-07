@@ -15,24 +15,21 @@
   "license": "ISC",
   "author": "Michael Ahern <michael.ahern@gmail.com>",
   "files": [
-    "./dist"
+    "./bin"
   ],
   "type": "module",
-  "exports": {
-    ".": {
-      "default": "./dist/mb-service.js",
-      "types": "./dist/mb-service.d.ts"
-    }
+  "main": "./bin/mb-service.js",
+  "types": "./bin/mb-service.d.ts",
+  "bin": {
+    "mb-service": "bin/mb-service.js"
   },
-  "main": "./dist/mb-service.js",
-  "types": "./dist/mb-service.d.ts",
   "repository": {
     "type": "git",
     "url": "git://github.com/michaelahern/mb-service.git"
   },
   "scripts": {
     "build": "npm run clean && npm run lint && tsc",
-    "clean": "rimraf ./dist",
+    "clean": "rimraf ./bin",
     "lint": "eslint src/**/*.ts --max-warnings=0",
     "lint-fix": "eslint src/**/*.ts --max-warnings=0 --fix",
     "prepublishOnly": "npm run build"

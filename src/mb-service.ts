@@ -1,5 +1,7 @@
-import { parseArgs } from 'node:util';
+#!/usr/bin/env node
+
 import { platform } from 'node:os';
+import { parseArgs } from 'node:util';
 import { MacPlatform } from './macos.js';
 import { LinuxPlatform } from './linux.js';
 import { PlatformCommands } from './platform.js';
@@ -45,12 +47,22 @@ async function main() {
             platformCommands.restart();
             break;
         case undefined:
-            console.log('No command specified. Available commands: install, uninstall, start, stop, restart');
+            help();
             break;
         default:
             console.log(`Unknown command: ${command}`);
-            console.log('Available commands: install, uninstall');
+            help();
     }
+}
+
+function help() {
+    console.log('Usage: mb-service <command>');
+    console.log('Commands:');
+    console.log('  install       Install the Matterbridge service');
+    console.log('  uninstall     Uninstall the Matterbridge service');
+    console.log('  start         Start the Matterbridge service');
+    console.log('  stop          Stop the Matterbridge service');
+    console.log('  restart       Restart the Matterbridge service');
 }
 
 main().catch(err => console.error(err));
