@@ -11,11 +11,6 @@ export class LinuxPlatform extends PlatformCommands {
         process.exit(1);
     }
 
-    isRunning(): boolean {
-        console.error('Platform not implemented yet.');
-        process.exit(1);
-    }
-
     start(): void {
         console.error('Platform not implemented yet.');
         process.exit(1);

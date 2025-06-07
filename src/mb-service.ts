@@ -34,9 +34,6 @@ async function main() {
         case 'uninstall':
             platformCommands.uninstall();
             break;
-        case 'is-running':
-            console.log(platformCommands.isRunning());
-            break;
         case 'start':
             platformCommands.start();
             break;
@@ -74,6 +71,7 @@ function help() {
     console.log('  start         Start the Matterbridge service');
     console.log('  stop          Stop the Matterbridge service');
     console.log('  restart       Restart the Matterbridge service');
+    console.log('  pid           Get the process id of the Matterbridge service');
     console.log('  tail          Tail the Matterbridge log file');
 }
 

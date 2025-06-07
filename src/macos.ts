@@ -9,10 +9,6 @@ import { PlatformCommands } from './platform.js';
 export class MacPlatform extends PlatformCommands {
     #plist = '/Library/LaunchDaemons/com.matterbridge.plist';
 
-    isInstalled(): boolean {
-        return existsSync(this.#plist);
-    }
-
     install(): void {
         this.#checkRoot();
         const userInfo = this.#getUserInfo();
@@ -79,26 +75,16 @@ export class MacPlatform extends PlatformCommands {
         console.info('Matterbridge Service Uninstalled!');
     }
 
-    isRunning(): boolean {
-        try {
-            execFileSync('launchctl', ['print', 'system/com.matterbridge'], { stdio: 'ignore' });
-            return true;
-        }
-        catch {
-            return false;
-        }
-    }
-
     start(): void {
         this.#checkRoot();
 
-        if (!this.isInstalled()) {
+        if (!this.#isInstalled()) {
             console.error('Matterbridge Service Not Installed!');
             console.error('sudo mb-service install');
             process.exit(1);
         }
 
-        if (this.isRunning()) {
+        if (this.pid()) {
             console.warn('Matterbridge Service Already Running!');
             return;
         }
@@ -110,13 +96,13 @@ export class MacPlatform extends PlatformCommands {
     stop(): void {
         this.#checkRoot();
 
-        if (!this.isInstalled()) {
+        if (!this.#isInstalled()) {
             console.error('Matterbridge Service Not Installed!');
             console.error('sudo mb-service install');
             process.exit(1);
         }
 
-        if (this.isRunning()) {
+        if (this.pid()) {
             console.info('Stopping Matterbridge Service...');
             execFileSync('launchctl', ['bootout', 'system/com.matterbridge']);
         }
@@ -129,7 +115,7 @@ export class MacPlatform extends PlatformCommands {
 
     pid(): string | null {
         try {
-            const output = execFileSync('launchctl', ['print', 'system/com.matterbridge']).toString();
+            const output = execFileSync('launchctl', ['print', 'system/com.matterbridge'], { stdio: 'ignore' }).toString();
             const match = output.match(/pid = (\d+)/);
             if (match) {
                 return match[1];
@@ -166,5 +152,9 @@ export class MacPlatform extends PlatformCommands {
         }
 
         return userInfo();
+    }
+
+    #isInstalled(): boolean {
+        return existsSync(this.#plist);
     }
 }
