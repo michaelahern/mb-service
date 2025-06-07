@@ -23,6 +23,11 @@ export class MacOS extends Platform {
         chownSync(storagePath, userInfo.uid, userInfo.gid);
 
         const matterbridgePath = execSync('eval echo "$(npm prefix -g --silent)/bin/matterbridge"').toString().trim();
+        if (!existsSync(matterbridgePath)) {
+            console.error('Matterbridge is not installed globally!');
+            console.error('npm install -g matterbridge');
+            process.exit(1);
+        }
 
         const plistFileContents = [
             '<?xml version="1.0" encoding="UTF-8"?>',
@@ -63,6 +68,7 @@ export class MacOS extends Platform {
     }
 
     uninstall(): void {
+        this.#checkRoot();
         this.stop();
         if (existsSync(this.#plist)) {
             unlinkSync(this.#plist);
@@ -73,18 +79,39 @@ export class MacOS extends Platform {
         }
     }
 
+    isRunning(): boolean {
+        try {
+            execFileSync('launchctl', ['print', 'system/com.matterbridge']);
+            return true;
+        }
+        catch {
+            return false;
+        }
+    }
+
     start(): void {
         this.#checkRoot();
+
+        if (this.isRunning()) {
+            console.warn('Matterbridge already running!');
+            return;
+        }
+
         console.info('Starting Matterbridge...');
-        execFileSync('launchctl', ['load', '-w', this.#plist]);
-        console.info('Matterbridge Started!');
+        execFileSync('launchctl', ['enable', 'system/com.matterbridge']);
+        execFileSync('launchctl', ['bootout', 'system', this.#plist]);
     }
 
     stop(): void {
         this.#checkRoot();
+
+        if (!this.isRunning()) {
+            console.warn('Matterbridge is not running!');
+            return;
+        }
+
         console.info('Stopping Matterbridge...');
-        execFileSync('launchctl', ['unload', '-w', this.#plist]);
-        console.info('Matterbridge Stopped!');
+        execFileSync('launchctl', ['bootout', 'system/com.matterbridge']);
     }
 
     restart(): void {
@@ -93,9 +120,9 @@ export class MacOS extends Platform {
     }
 
     #checkRoot() {
-        if (!process.getuid || process.getuid() !== 0 || !process.env.SUDO_USER) {
-            console.error('ERROR: Run command as sudo!');
-            console.error(`sudo mb-service <TODO>`);
+        if (!process.getuid || process.getuid() !== 0) {
+            console.error('Run as sudo or root user!');
+            console.error(`sudo mb-service <command>`);
             process.exit(1);
         }
     }
@@ -105,10 +132,10 @@ export class MacOS extends Platform {
         if (process.env.SUDO_USER && process.env.SUDO_UID && process.env.SUDO_GID) {
             return {
                 username: process.env.SUDO_USER,
-                uid: Number.parseInt(process.env.SUDO_UID, 10),
-                gid: Number.parseInt(process.env.SUDO_GID, 10),
+                uid: Number.parseInt(process.env.SUDO_UID),
+                gid: Number.parseInt(process.env.SUDO_GID),
                 shell: null,
-                homedir: execSync(`eval echo "~${process.env.SUDO_USER}"`).toString().trim()
+                homedir: execSync(`eval echo ~"${process.env.SUDO_USER}"`).toString().trim()
             };
         }
 

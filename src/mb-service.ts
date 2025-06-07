@@ -20,6 +20,10 @@ async function main() {
             macos.uninstall();
             break;
 
+        case 'is-running':
+            console.log(macos.isRunning());
+            break;
+
         case 'start':
             macos.start();
             break;
