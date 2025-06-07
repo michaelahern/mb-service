@@ -2,23 +2,19 @@ import { PlatformCommands } from './platform.js';
 
 export class LinuxPlatform extends PlatformCommands {
     install(): void {
-        console.error('Platform not implemented yet.');
-        process.exit(1);
+        process.exit(2);
     }
 
     uninstall(): void {
-        console.error('Platform not implemented yet.');
-        process.exit(1);
+        process.exit(2);
     }
 
     start(): void {
-        console.error('Platform not implemented yet.');
-        process.exit(1);
+        process.exit(2);
     }
 
     stop(): void {
-        console.error('Platform not implemented yet.');
-        process.exit(1);
+        process.exit(2);
     }
 
     pid(): string | null {
@@ -26,7 +22,6 @@ export class LinuxPlatform extends PlatformCommands {
     }
 
     tail(): void {
-        console.error('Platform not implemented yet.');
-        process.exit(1);
+        process.exit(2);
     }
 }

@@ -3,7 +3,6 @@
 import { platform } from 'node:os';
 import { parseArgs } from 'node:util';
 import { MacPlatform } from './mac.js';
-import { LinuxPlatform } from './linux.js';
 import { PlatformCommands } from './platform.js';
 
 async function main() {
@@ -18,12 +17,12 @@ async function main() {
         case 'darwin':
             platformCommands = new MacPlatform();
             break;
-        case 'linux':
-            platformCommands = new LinuxPlatform();
-            break;
+        // case 'linux':
+        //     platformCommands = new LinuxPlatform();
+        //     break;
         default:
             console.log('Platform not supported:', platform());
-            process.exit(1);
+            process.exit(2);
     }
 
     const command = positionals[0];
@@ -59,7 +58,7 @@ async function main() {
             help();
             break;
         default:
-            console.log(`Unknown command: ${command}`);
+            console.error(`Unknown command: ${command}`);
             help();
     }
 }
