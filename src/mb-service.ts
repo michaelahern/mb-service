@@ -62,6 +62,7 @@ async function main() {
         default:
             console.error(`Unknown command: ${command}`);
             help();
+            process.exit(1);
     }
 }
 
