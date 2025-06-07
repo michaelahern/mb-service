@@ -108,11 +108,6 @@ export class MacPlatform extends PlatformCommands {
         }
     }
 
-    restart(): void {
-        this.stop();
-        this.start();
-    }
-
     pid(): string | null {
         try {
             const output = execFileSync('launchctl', ['print', 'system/com.matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] }).toString();

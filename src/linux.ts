@@ -21,11 +21,6 @@ export class LinuxPlatform extends PlatformCommands {
         process.exit(1);
     }
 
-    restart(): void {
-        console.error('Platform not implemented yet.');
-        process.exit(1);
-    }
-
     pid(): string | null {
         return null;
     }
