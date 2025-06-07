@@ -28,7 +28,7 @@
     "url": "git://github.com/michaelahern/mb-service.git"
   },
   "scripts": {
-    "build": "npm run clean && npm run lint && tsc",
+    "build": "npm run lint && tsc && chmod +x ./bin/mb-service.js",
     "clean": "rimraf ./bin",
     "lint": "eslint src/**/*.ts --max-warnings=0",
     "lint-fix": "eslint src/**/*.ts --max-warnings=0 --fix",
