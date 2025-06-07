@@ -129,7 +129,7 @@ export class MacPlatform extends PlatformCommands {
 
     tail(): void {
         const storagePath = resolve(this.#getUserInfo().homedir, '.matterbridge');
-        execFileSync('tail', ['-f', `${storagePath}/matterbridge.log`], { stdio: 'inherit' });
+        execFileSync('tail', ['-f', '-n', '32', `${storagePath}/matterbridge.log`], { stdio: 'inherit' });
     }
 
     #checkRoot() {
