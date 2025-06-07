@@ -19,7 +19,7 @@ export abstract class PlatformCommands {
             }
 
             const ipv4Address = interfaceDetails.find(i => i.family === 'IPv4' && !i.internal)?.address;
-            const ipv6Address = interfaceDetails.find(i => i.family === 'IPv6' && !i.internal)?.address;
+            const ipv6Address = interfaceDetails.find(i => i.family === 'IPv6' && !i.internal && (i.scopeid === undefined || i.scopeid === 0))?.address;
 
             if (ipv4Address || ipv6Address) {
                 if (ipv4Address) {
