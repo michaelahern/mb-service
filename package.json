@@ -1,8 +1,8 @@
 {
   "name": "mb-service",
-  "displayName": "Matterbridge Service CLI",
+  "displayName": "Matterbridge Service Command",
   "version": "0.1.0",
-  "description": "Matterbridge Service CLI",
+  "description": "Matterbridge Service Command",
   "keywords": [
     "matter",
     "matter.js",

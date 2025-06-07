@@ -41,7 +41,9 @@ async function main() {
             break;
         case 'restart':
             platformCommands.stop();
-            platformCommands.start();
+            setTimeout(() => {
+                platformCommands.start();
+            }, 2000);
             break;
         case 'pid': {
             const pid = platformCommands.pid();
