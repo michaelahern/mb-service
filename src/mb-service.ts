@@ -1,5 +1,8 @@
 import { parseArgs } from 'node:util';
-import { MacOS } from './macos.js';
+import { platform } from 'node:os';
+import { MacPlatform } from './macos.js';
+import { LinuxPlatform } from './linux.js';
+import { PlatformCommands } from './platform.js';
 
 async function main() {
     const { positionals } = parseArgs({
@@ -8,34 +11,42 @@ async function main() {
         allowPositionals: true
     });
 
-    const command = positionals[0];
-    const macos = new MacOS();
+    let platformCommands: PlatformCommands;
+    switch (platform()) {
+        case 'darwin':
+            platformCommands = new MacPlatform();
+            break;
+        case 'linux':
+            platformCommands = new LinuxPlatform();
+            break;
+        default:
+            console.log('Platform not supported:', platform());
+            process.exit(1);
+    }
 
+    const command = positionals[0];
     switch (command) {
         case 'install':
-            macos.install();
+            platformCommands.install();
             break;
-
         case 'uninstall':
-            macos.uninstall();
+            platformCommands.uninstall();
             break;
-
         case 'is-running':
-            console.log(macos.isRunning());
+            console.log(platformCommands.isRunning());
             break;
-
         case 'start':
-            macos.start();
+            platformCommands.start();
             break;
-
         case 'stop':
-            macos.stop();
+            platformCommands.stop();
             break;
-
+        case 'restart':
+            platformCommands.restart();
+            break;
         case undefined:
-            console.log('No command specified. Available commands: install, uninstall, start, stop');
+            console.log('No command specified. Available commands: install, uninstall, start, stop, restart');
             break;
-
         default:
             console.log(`Unknown command: ${command}`);
             console.log('Available commands: install, uninstall');

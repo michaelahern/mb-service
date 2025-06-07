@@ -1,4 +1,4 @@
-export abstract class Platform {
+export abstract class PlatformCommands {
     abstract install(): void;
     abstract uninstall(): void;
     abstract isRunning(): boolean;

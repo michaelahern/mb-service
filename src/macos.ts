@@ -4,9 +4,9 @@ import { UserInfo, userInfo } from 'node:os';
 import { resolve } from 'node:path';
 import process from 'node:process';
 
-import { Platform } from './platform.js';
+import { PlatformCommands } from './platform.js';
 
-export class MacOS extends Platform {
+export class MacPlatform extends PlatformCommands {
     #plist = '/Library/LaunchDaemons/com.matterbridge.plist';
 
     install(): void {
