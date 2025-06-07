@@ -2,7 +2,7 @@
 
 import { platform } from 'node:os';
 import { parseArgs } from 'node:util';
-import { MacPlatform } from './macos.js';
+import { MacPlatform } from './mac.js';
 import { LinuxPlatform } from './linux.js';
 import { PlatformCommands } from './platform.js';
 
