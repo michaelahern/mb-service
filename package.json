@@ -1,0 +1,54 @@
+{
+  "name": "mb-service",
+  "displayName": "Matterbridge Service CLI",
+  "version": "0.1.0",
+  "description": "Matterbridge Service CLI",
+  "keywords": [
+    "matter",
+    "matter.js",
+    "matterbridge"
+  ],
+  "homepage": "https://github.com/michaelahern/mb-service",
+  "bugs": {
+    "url": "http://github.com/michaelahern/mb-service/issues"
+  },
+  "license": "ISC",
+  "author": "Michael Ahern <michael.ahern@gmail.com>",
+  "files": [
+    "./dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./dist/mb-service.js",
+      "types": "./dist/mb-service.d.ts"
+    }
+  },
+  "main": "./dist/mb-service.js",
+  "types": "./dist/mb-service.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/michaelahern/mb-service.git"
+  },
+  "scripts": {
+    "build": "npm run clean && npm run lint && tsc",
+    "clean": "rimraf ./dist",
+    "lint": "eslint src/**/*.ts --max-warnings=0",
+    "lint-fix": "eslint src/**/*.ts --max-warnings=0 --fix",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "airthings-consumer-api": "^1"
+  },
+  "devDependencies": {
+    "@stylistic/eslint-plugin": "^4",
+    "@types/node": "^20",
+    "eslint": "^9",
+    "rimraf": "^6",
+    "typescript": "~5.8",
+    "typescript-eslint": "^8"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
