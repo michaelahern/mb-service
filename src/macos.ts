@@ -65,7 +65,7 @@ export class MacPlatform extends PlatformCommands {
         writeFileSync(this.#plist, plistFileContents);
         console.info('Matterbridge Service Installed!');
         this.start();
-        // Post Install Console
+        this.postinstall();
     }
 
     uninstall(): void {
@@ -115,7 +115,7 @@ export class MacPlatform extends PlatformCommands {
 
     pid(): string | null {
         try {
-            const output = execFileSync('launchctl', ['print', 'system/com.matterbridge'], { stdio: 'ignore' }).toString();
+            const output = execFileSync('launchctl', ['print', 'system/com.matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
             const match = output.match(/pid = (\d+)/);
             if (match) {
                 return match[1];
