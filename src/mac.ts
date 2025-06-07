@@ -58,6 +58,8 @@ export class MacPlatform extends PlatformCommands {
             `    <string>${storagePath}/matterbridge.log</string>`,
             '    <key>StandardErrorPath</key>',
             `    <string>${storagePath}/matterbridge.log</string>`,
+            '    <key>WorkingDirectory</key>',
+            `    <string>${pluginPath}</string>`,
             '</dict>',
             '</plist>'
         ].filter(x => x).join('\n');
