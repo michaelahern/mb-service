@@ -24,7 +24,7 @@ Commands:
 
 % sudo mb-service install
 Matterbridge Service Installed!
-Matterbridge Service Already Running!
+Starting Matterbridge Service...
 
 Manage Matterbridge in your browser at:
  * http://localhost:8283
