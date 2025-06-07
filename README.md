@@ -42,28 +42,28 @@ You can inspect the service status and configuration using:
 ```
 % launchctl print system/com.matterbridge
 system/com.matterbridge = {
-	active count = 1
-	path = /Library/LaunchDaemons/com.matterbridge.plist
-	type = LaunchDaemon
-	state = running
+    active count = 1
+    path = /Library/LaunchDaemons/com.matterbridge.plist
+    type = LaunchDaemon
+    state = running
 
-	program = /opt/homebrew/bin/matterbridge
-	arguments = {
-		/opt/homebrew/bin/matterbridge
-		-service
-	}
+    program = /opt/homebrew/bin/matterbridge
+    arguments = {
+        /opt/homebrew/bin/matterbridge
+        -service
+    }
 
-	stdout path = /Users/me/.matterbridge/matterbridge.log
-	stderr path = /Users/me/.matterbridge/matterbridge.log
-	default environment = {
-		PATH => /usr/bin:/bin:/usr/sbin:/sbin
-	}
+    stdout path = /Users/me/.matterbridge/matterbridge.log
+    stderr path = /Users/me/.matterbridge/matterbridge.log
+    default environment = {
+        PATH => /usr/bin:/bin:/usr/sbin:/sbin
+    }
 
-	environment = {
-		PATH => /opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
-		HOME => /Users/me
-		XPC_SERVICE_NAME => com.matterbridge
-	}
+    environment = {
+        PATH => /opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
+        HOME => /Users/me
+        XPC_SERVICE_NAME => com.matterbridge
+    }
 
     ...
 }
