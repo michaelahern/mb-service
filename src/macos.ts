@@ -81,7 +81,7 @@ export class MacOS extends Platform {
 
     isRunning(): boolean {
         try {
-            execFileSync('launchctl', ['print', 'system/com.matterbridge']);
+            execFileSync('launchctl', ['print', 'system/com.matterbridge'], { stdio: 'ignore' });
             return true;
         }
         catch {
