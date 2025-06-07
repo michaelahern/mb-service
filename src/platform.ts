@@ -4,5 +4,4 @@ export abstract class Platform {
     abstract start(): void;
     abstract stop(): void;
     abstract restart(): void;
-    abstract getId(): { uid: number; gid: number };
 }
