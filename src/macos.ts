@@ -98,7 +98,7 @@ export class MacOS extends Platform {
         }
 
         console.info('Starting Matterbridge...');
-        execFileSync('launchctl', ['enable', 'system/com.matterbridge']);
+        // execFileSync('launchctl', ['enable', 'system/com.matterbridge']);
         execFileSync('launchctl', ['bootstrap', 'system', this.#plist]);
     }
 
