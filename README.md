@@ -1,5 +1,10 @@
 # Matterbridge Service Command
 
+[![npm](https://badgen.net/npm/v/mb-service)](https://www.npmjs.com/package/mb-service)
+[![node](https://badgen.net/npm/node/mb-service)](https://www.npmjs.com/package/mb-service)
+[![downloads](https://badgen.net/npm/dt/mb-service)](https://www.npmjs.com/package/mb-service)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/michaelahern/mb-service)
+
 A service management command-line utility for [Matterbridge](https://github.com/Luligu/matterbridge/), inspired by [Homebridge's](https://github.com/homebridge/homebridge-config-ui-x/wiki/Homebridge-Service-Command) `hb-service`.               
 
 _This is currently experimental and only supports macOS with a default configuration at the moment!_
