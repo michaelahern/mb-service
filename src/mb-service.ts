@@ -34,7 +34,7 @@ async function main() {
             platformCommands = new MacPlatform();
             break;
         default:
-            console.log('Platform not supported:', platform());
+            console.error('Platform not supported:', platform());
             process.exit(2);
     }
 
