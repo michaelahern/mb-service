@@ -22,6 +22,7 @@ jobs:
       - run: sudo chown -R root:wheel "$(npm prefix -g --silent)/lib/node_modules"
       - run: sudo mb-service install
       - run: mb-service pid
+      - run: curl http://localhost:8283/
       - run: launchctl print system/com.matterbridge
       - run: test -w "$(npm prefix -g --silent)/lib/node_modules"
       - run: sudo mb-service uninstall
