@@ -8,7 +8,8 @@ _This is currently experimental and only supports macOS with a default configura
 % npm install -g matterbridge mb-service
 
 % mb-service
-Usage: mb-service <command>
+Usage: mb-service <command> [options]
+
 Commands:
   install       Install the Matterbridge service
   uninstall     Uninstall the Matterbridge service
@@ -17,6 +18,10 @@ Commands:
   restart       Restart the Matterbridge service
   pid           Get the process id of the Matterbridge service
   tail          Tail the Matterbridge log file
+
+Options:
+  -h, --help
+  -v, --version
 
 % sudo mb-service install
 Matterbridge Service Installed!
