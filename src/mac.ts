@@ -41,6 +41,8 @@ export class MacPlatform extends PlatformCommands {
                 execSync(`chown -R ${userInfo.uid}:${userInfo.gid} "${npmGlobalModulesPath}"`);
             }
             catch {
+                console.error('User not able to write to the NPM Global Modules Path!');
+                console.error(`sudo chown -R ${userInfo.uid}:${userInfo.gid} "${npmGlobalModulesPath}"`);
                 process.exit(1);
             }
         }
