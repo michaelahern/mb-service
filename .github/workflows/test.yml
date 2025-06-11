@@ -23,5 +23,5 @@ jobs:
       - run: sudo mb-service install
       - run: mb-service pid
       - run: launchctl print system/com.matterbridge
-      - run: test -w "$(npm prefix -g --silent)/lib"
+      - run: test -w "$(npm prefix -g --silent)/lib/node_modules"
       - run: sudo mb-service uninstall
