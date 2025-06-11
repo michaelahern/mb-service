@@ -5,7 +5,7 @@ A service management command-line utility for [Matterbridge](https://github.com/
 _This is currently experimental and only supports macOS with a default configuration at the moment!_
 
 ```
-% npm -g install matterbridge
+% npm install -g matterbridge
 % git clone https://github.com/michaelahern/mb-service.git
 % cd mb-service
 % npm install
