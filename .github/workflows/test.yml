@@ -7,7 +7,7 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
+  test-macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,5 +19,5 @@ jobs:
       - run: npm link matterbridge
       - run: npm run build
       - run: npm link
-      - run: mb-service install
+      - run: sudo mb-service install
       - run: mb-service pid
