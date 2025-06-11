@@ -22,7 +22,7 @@ async function main() {
     }
 
     if (args.values.version) {
-        const packageJson = readFileSync('./package.json', 'utf8');
+        const packageJson = readFileSync(new URL('../package.json', import.meta.url), 'utf8');
         const packageInfo = JSON.parse(packageJson);
         console.log(packageInfo.version);
         process.exit(0);
