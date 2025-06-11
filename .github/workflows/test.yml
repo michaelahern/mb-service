@@ -20,13 +20,14 @@ jobs:
       - run: npm run build
       - run: npm link
       - run: |
+          mb-service
           mb-service -h
           mb-service -v
           mb-service --help
           mb-service --version
       - run: |
           ls -la "$(npm prefix -g --silent)/lib"
-          sudo chown -R root:wheel "$(npm prefix -g --silent)/lib/node_modules"
+          chown -R root:wheel "$(npm prefix -g --silent)/lib/node_modules"
           ls -la "$(npm prefix -g --silent)/lib"
       - run: sudo mb-service install
       - run: |
