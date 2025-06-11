@@ -19,26 +19,20 @@ jobs:
       - run: npm link matterbridge
       - run: npm run build
       - run: npm link
-      - name: mb-service help and version
-        run: |
-          mb-service
+      - run: |
           mb-service -h
-          mb-service -v
           mb-service --help
+      - run: |
+          mb-service -v
           mb-service --version
-      - name: npm global modules path owned by root
-        run: |
-          ls -la "$(npm prefix -g --silent)/lib"
+      - run: |
           sudo chown -R root:wheel "$(npm prefix -g --silent)/lib/node_modules"
           ls -la "$(npm prefix -g --silent)/lib"
       - run: sudo mb-service install
-      - name: npm global modules path owned by runner
-        run: |
-          ls -la "$(npm prefix -g --silent)/lib"
+      - run: |
           test -w "$(npm prefix -g --silent)/lib/node_modules"
+          ls -la "$(npm prefix -g --silent)/lib"
       - run: mb-service pid && launchctl print system/com.matterbridge
-      - name: curl http://localhost:8283/ 
-        run: |
-          sleep 10
-          curl http://localhost:8283/
+      - run: sleep 10
+      - run: curl http://localhost:8283/
       - run: sudo mb-service uninstall
