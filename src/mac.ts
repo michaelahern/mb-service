@@ -96,12 +96,7 @@ export class MacPlatform extends PlatformCommands {
 
     start(): void {
         this.#checkRoot();
-
-        if (!this.#isInstalled()) {
-            console.error('Matterbridge Service Not Installed!');
-            console.error('sudo mb-service install');
-            process.exit(1);
-        }
+        this.#checkInstalled();
 
         if (this.pid()) {
             console.warn('Matterbridge Service Already Running!');
@@ -114,12 +109,7 @@ export class MacPlatform extends PlatformCommands {
 
     stop(): void {
         this.#checkRoot();
-
-        if (!this.#isInstalled()) {
-            console.error('Matterbridge Service Not Installed!');
-            console.error('sudo mb-service install');
-            process.exit(1);
-        }
+        this.#checkInstalled();
 
         if (this.pid()) {
             console.info('Stopping Matterbridge Service...');
@@ -154,6 +144,14 @@ export class MacPlatform extends PlatformCommands {
         }
     }
 
+    #checkInstalled(): void {
+        if (!existsSync(this.#plist)) {
+            console.error('Matterbridge Service Not Installed!');
+            console.error('sudo mb-service install');
+            process.exit(1);
+        }
+    }
+
     #getUserInfo(): UserInfo<string> {
         if (process.env.SUDO_USER && process.env.SUDO_UID && process.env.SUDO_GID) {
             return {
@@ -166,10 +164,6 @@ export class MacPlatform extends PlatformCommands {
         }
 
         return userInfo();
-    }
-
-    #isInstalled(): boolean {
-        return existsSync(this.#plist);
     }
 
     #mkdirPath(path: string, userInfo: UserInfo<string>): void {
