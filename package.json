@@ -1,7 +1,7 @@
 {
   "name": "mb-service",
   "displayName": "Matterbridge Service Command",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A service management command-line utility for Matterbridge, inspired by Homebridge's 'hb-service'.",
   "keywords": [
     "matter",
