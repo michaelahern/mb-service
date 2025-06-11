@@ -19,5 +19,8 @@ jobs:
       - run: npm link matterbridge
       - run: npm run build
       - run: npm link
+      - run: whoami
+      - run: ls -la $(npm prefix -g --silent)/lib/
       - run: sudo mb-service install
+      - run: ls -la $(npm prefix -g --silent)/lib/
       - run: mb-service pid

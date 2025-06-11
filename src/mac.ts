@@ -28,7 +28,7 @@ export class MacPlatform extends PlatformCommands {
         const matterbridgeStoragePath = resolve(userInfo.homedir, '.matterbridge');
         this.#mkdirPath(matterbridgeStoragePath, userInfo);
 
-        // Check NPM global modules path permissions and change if ncessary
+        // Check NPM global modules path permissions and change if necessary
         const npmGlobalModulesPath = execSync('eval echo "$(npm prefix -g --silent)/lib/node_modules"').toString().trim();
         try {
             execSync(`eval test -w "${npmGlobalModulesPath}"`, {
