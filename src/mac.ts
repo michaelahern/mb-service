@@ -145,7 +145,7 @@ export class MacPlatform extends PlatformCommands {
     }
 
     #checkInstalled(): void {
-        if (existsSync(this.#plist)) {
+        if (!existsSync(this.#plist)) {
             console.error('Matterbridge Service Not Installed!');
             console.error('sudo mb-service install');
             process.exit(1);
