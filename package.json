@@ -2,10 +2,9 @@
   "name": "mb-service",
   "displayName": "Matterbridge Service Command",
   "version": "0.1.0",
-  "description": "Matterbridge Service Command",
+  "description": "A service management command-line utility for Matterbridge, inspired by Homebridge's 'hb-service'.",
   "keywords": [
     "matter",
-    "matter.js",
     "matterbridge"
   ],
   "homepage": "https://github.com/michaelahern/mb-service",
