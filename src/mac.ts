@@ -13,15 +13,7 @@ export class MacPlatform extends PlatformCommands {
         this.#checkRoot();
         const userInfo = this.#getUserInfo();
 
-        const pluginPath = resolve(userInfo.homedir, 'Matterbridge');
-        const storagePath = resolve(userInfo.homedir, '.matterbridge');
-
-        mkdirSync(pluginPath, { recursive: true });
-        mkdirSync(storagePath, { recursive: true });
-
-        chownSync(pluginPath, userInfo.uid, userInfo.gid);
-        chownSync(storagePath, userInfo.uid, userInfo.gid);
-
+        // Check if Matterbridge is installed globally
         const matterbridgePath = execSync('eval echo "$(npm prefix -g --silent)/bin/matterbridge"').toString().trim();
         if (!existsSync(matterbridgePath)) {
             console.error('Matterbridge is not installed globally!');
@@ -29,6 +21,31 @@ export class MacPlatform extends PlatformCommands {
             process.exit(1);
         }
 
+        // Create Matterbridge Plugin and Storage directories
+        const matterbridgePluginPath = resolve(userInfo.homedir, 'Matterbridge');
+        this.#mkdirPath(matterbridgePluginPath, userInfo);
+
+        const matterbridgeStoragePath = resolve(userInfo.homedir, '.matterbridge');
+        this.#mkdirPath(matterbridgeStoragePath, userInfo);
+
+        // Check NPM global modules path permissions and change if ncessary
+        const npmGlobalModulesPath = execSync('eval echo "$(npm prefix -g --silent)/lib/node_modules"').toString().trim();
+        try {
+            execSync(`eval test -w "${npmGlobalModulesPath}"`, {
+                uid: userInfo.uid,
+                gid: userInfo.gid
+            });
+        }
+        catch {
+            try {
+                execSync(`chown -R ${userInfo.username}:admin "${npmGlobalModulesPath}"`);
+            }
+            catch {
+                process.exit(1);
+            }
+        }
+
+        // Create the launchd plist file
         const plistFileContents = [
             '<?xml version="1.0" encoding="UTF-8"?>',
             '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
@@ -55,9 +72,9 @@ export class MacPlatform extends PlatformCommands {
             `        <string>${process.env.PATH}</string>`,
             '    </dict>',
             '    <key>StandardOutPath</key>',
-            `    <string>${storagePath}/matterbridge.log</string>`,
+            `    <string>${matterbridgeStoragePath}/matterbridge.log</string>`,
             '    <key>StandardErrorPath</key>',
-            `    <string>${storagePath}/matterbridge.log</string>`,
+            `    <string>${matterbridgeStoragePath}/matterbridge.log</string>`,
             '</dict>',
             '</plist>'
         ].filter(x => x).join('\n');
@@ -123,8 +140,8 @@ export class MacPlatform extends PlatformCommands {
     }
 
     tail(): void {
-        const storagePath = resolve(this.#getUserInfo().homedir, '.matterbridge');
-        execFileSync('tail', ['-f', '-n', '32', `${storagePath}/matterbridge.log`], { stdio: 'inherit' });
+        const matterbridgeStoragePath = resolve(this.#getUserInfo().homedir, '.matterbridge');
+        execFileSync('tail', ['-f', '-n', '32', `${matterbridgeStoragePath}/matterbridge.log`], { stdio: 'inherit' });
     }
 
     #checkRoot() {
@@ -151,5 +168,10 @@ export class MacPlatform extends PlatformCommands {
 
     #isInstalled(): boolean {
         return existsSync(this.#plist);
+    }
+
+    #mkdirPath(path: string, userInfo: UserInfo<string>): void {
+        mkdirSync(path, { recursive: true });
+        chownSync(path, userInfo.uid, userInfo.gid);
     }
 }

@@ -1,0 +1,23 @@
+name: Test
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+      - run: npm install -g matterbridge
+      - run: npm ci
+      - run: npm link matterbridge
+      - run: npm run build
+      - run: npm link
+      - run: mb-service install
+      - run: mb-service pid
