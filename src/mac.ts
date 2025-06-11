@@ -38,7 +38,7 @@ export class MacPlatform extends PlatformCommands {
         }
         catch {
             try {
-                execSync(`chown -R ${userInfo.username}:admin "${npmGlobalModulesPath}"`);
+                execSync(`chown -R ${userInfo.uid}:${userInfo.gid} "${npmGlobalModulesPath}"`);
             }
             catch {
                 process.exit(1);
