@@ -85,11 +85,21 @@ export class LinuxPlatform extends PlatformCommands {
     }
 
     pid(): string | null {
-        return null;
+        try {
+            const output = execFileSync('systemctl', ['show', '--property', 'MainPID', '--value', 'matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
+            const match = output.match(/^(\d+)$/);
+            if (match) {
+                return match[1];
+            }
+            return null;
+        }
+        catch {
+            return null;
+        }
     }
 
     tail(): void {
-        process.exit(2);
+        execFileSync('journalctl', ['-u', 'matterbridge', '-n', '32', '-f', '--output', 'cat'], { stdio: 'inherit' });
     }
 
     #checkInstalled(): void {
