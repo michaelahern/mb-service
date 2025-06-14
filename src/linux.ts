@@ -87,8 +87,8 @@ export class LinuxPlatform extends PlatformCommands {
     pid(): string | null {
         try {
             const output = execFileSync('systemctl', ['show', '--property', 'MainPID', '--value', 'matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
-            const match = output.match(/^(\d+)$/);
-            if (match) {
+            const match = output.match(/(\d+)/);
+            if (match && match[1] !== '0') {
                 return match[1];
             }
             return null;
