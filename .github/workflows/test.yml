@@ -26,7 +26,7 @@ jobs:
           mb-service -v
           mb-service --version
       - run: sudo mb-service install
-      - run: mb-service pid && systemctl status com.matterbridge
+      - run: mb-service pid && systemctl status matterbridge
       - run: sleep 10
       - run: curl http://localhost:8283/
       - run: sudo mb-service uninstall
