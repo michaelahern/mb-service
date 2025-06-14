@@ -7,6 +7,29 @@ on:
     branches: [ main ]
 
 jobs:
+  test-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+      - run: npm install -g matterbridge
+      - run: npm ci
+      - run: npm link matterbridge
+      - run: npm run build
+      - run: npm link
+      - run: |
+          mb-service -h
+          mb-service --help
+      - run: |
+          mb-service -v
+          mb-service --version
+      - run: sudo mb-service install
+      - run: mb-service pid && systemctl status com.matterbridge
+      - run: sleep 10
+      - run: curl http://localhost:8283/
+      - run: sudo mb-service uninstall
   test-macos:
     runs-on: macos-latest
     steps:
