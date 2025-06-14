@@ -10,7 +10,7 @@ export class MacPlatform extends PlatformCommands {
     #plist = '/Library/LaunchDaemons/com.matterbridge.plist';
 
     install(): void {
-        this.#checkRoot();
+        this.checkRoot();
         const userInfo = this.#getUserInfo();
 
         // Check if Matterbridge is installed globally
@@ -88,14 +88,14 @@ export class MacPlatform extends PlatformCommands {
     }
 
     uninstall(): void {
-        this.#checkRoot();
+        this.checkRoot();
         this.stop();
         unlinkSync(this.#plist);
         console.info('Matterbridge Service Uninstalled!');
     }
 
     start(): void {
-        this.#checkRoot();
+        this.checkRoot();
         this.#checkInstalled();
 
         if (this.pid()) {
@@ -108,7 +108,7 @@ export class MacPlatform extends PlatformCommands {
     }
 
     stop(): void {
-        this.#checkRoot();
+        this.checkRoot();
         this.#checkInstalled();
 
         if (this.pid()) {
@@ -136,20 +136,8 @@ export class MacPlatform extends PlatformCommands {
         execFileSync('tail', ['-f', '-n', '32', `${matterbridgeStoragePath}/matterbridge.log`], { stdio: 'inherit' });
     }
 
-    #checkRoot() {
-        if (!process.getuid || process.getuid() !== 0) {
-            console.error('Must run as sudo!');
-            console.error(`sudo mb-service ${process.argv[2]}`);
-            process.exit(1);
-        }
-    }
-
     #checkInstalled(): void {
-        if (!existsSync(this.#plist)) {
-            console.error('Matterbridge Service Not Installed!');
-            console.error('sudo mb-service install');
-            process.exit(1);
-        }
+        super.checkInstalled(this.#plist);
     }
 
     #getUserInfo(): UserInfo<string> {

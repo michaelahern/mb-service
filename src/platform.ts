@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs';
 import { networkInterfaces } from 'node:os';
 
 export abstract class PlatformCommands {
@@ -30,6 +31,22 @@ export abstract class PlatformCommands {
                 }
                 break;
             }
+        }
+    }
+
+    protected checkRoot() {
+        if (!process.getuid || process.getuid() !== 0) {
+            console.error('Must run as sudo!');
+            console.error(`sudo mb-service ${process.argv[2]}`);
+            process.exit(1);
+        }
+    }
+
+    protected checkInstalled(path: string): void {
+        if (!existsSync(path)) {
+            console.error('Matterbridge Service Not Installed!');
+            console.error('sudo mb-service install');
+            process.exit(1);
         }
     }
 }
