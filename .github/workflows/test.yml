@@ -18,7 +18,7 @@ jobs:
       - run: npm ci
       - run: npm link matterbridge
       - run: npm run build
-      - run: npm link
+      - run: sudo npm link
       - run: |
           mb-service -h
           mb-service --help
