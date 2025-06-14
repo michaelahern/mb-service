@@ -26,6 +26,8 @@ export class LinuxPlatform extends PlatformCommands {
         const matterbridgeStoragePath = resolve(userInfo.homedir, '.matterbridge');
         this.#mkdirPath(matterbridgeStoragePath, userInfo);
 
+        this.#configSudoers(userInfo);
+
         const systemdServiceFileContents = [
             '[Unit]',
             'Description=matterbridge',
@@ -33,7 +35,7 @@ export class LinuxPlatform extends PlatformCommands {
             '',
             '[Service]',
             'Type=simple',
-            'ExecStart=matterbridge -service',
+            `ExecStart=${matterbridgePath} -service`,
             `WorkingDirectory=${matterbridgeStoragePath}`,
             'StandardOutput=inherit',
             'StandardError=inherit',
@@ -124,5 +126,22 @@ export class LinuxPlatform extends PlatformCommands {
     #mkdirPath(path: string, userInfo: UserInfo<string>): void {
         mkdirSync(path, { recursive: true });
         chownSync(path, userInfo.uid, userInfo.gid);
+    }
+
+    #configSudoers(userInfo: UserInfo<string>) {
+        try {
+            const npmPath = execSync('which npm').toString().trim();
+            const sudoersEntry = `${userInfo.username}    ALL=(ALL) NOPASSWD:SETENV: ${npmPath}, /usr/bin/npm, /usr/local/bin/npm`;
+
+            const sudoers = readFileSync('/etc/sudoers', 'utf-8');
+            if (sudoers.includes(sudoersEntry)) {
+                return;
+            }
+
+            execSync(`echo '${sudoersEntry}' | sudo EDITOR='tee -a' visudo`);
+        }
+        catch (error: Error) {
+            console.error('Failed to update /etc/sudoers:', error.message);
+        }
     }
 }
