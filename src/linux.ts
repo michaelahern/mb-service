@@ -40,6 +40,7 @@ export class LinuxPlatform extends PlatformCommands {
             'Restart=always',
             `User=${userInfo.username}`,
             `Group=${userInfo.username}`,
+            'AmbientCapabilities=CAP_NET_BIND_SERVICE CAP_NET_RAW',
             '',
             '[Install]',
             'WantedBy=multi-user.target'
