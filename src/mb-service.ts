@@ -3,6 +3,7 @@
 import { readFileSync } from 'node:fs';
 import { platform } from 'node:os';
 import { parseArgs } from 'node:util';
+import { LinuxPlatform } from './linux.js';
 import { MacPlatform } from './mac.js';
 import { PlatformCommands } from './platform.js';
 
@@ -30,6 +31,9 @@ async function main() {
 
     let platformCommands: PlatformCommands;
     switch (platform()) {
+        case 'linux':
+            platformCommands = new LinuxPlatform();
+            break;
         case 'darwin':
             platformCommands = new MacPlatform();
             break;
