@@ -11,15 +11,8 @@ export class MacPlatform extends PlatformCommands {
 
     install(): void {
         this.checkRoot();
+        const matterbridgePath = this.checkMatterbridgeInstalled();
         const userInfo = this.#getUserInfo();
-
-        // Check if Matterbridge is installed globally
-        const matterbridgePath = execSync('eval echo "$(npm prefix -g --silent)/bin/matterbridge"').toString().trim();
-        if (!existsSync(matterbridgePath)) {
-            console.error('Matterbridge is not installed globally!');
-            console.error('npm install -g matterbridge');
-            process.exit(1);
-        }
 
         // Create Matterbridge Plugin and Storage directories
         const matterbridgePluginPath = resolve(userInfo.homedir, 'Matterbridge');
@@ -90,13 +83,17 @@ export class MacPlatform extends PlatformCommands {
     uninstall(): void {
         this.checkRoot();
         this.stop();
-        unlinkSync(this.#plist);
+
+        if (existsSync(this.#plist)) {
+            unlinkSync(this.#plist);
+        }
+
         console.info('Matterbridge Service Uninstalled!');
     }
 
     start(): void {
         this.checkRoot();
-        this.#checkInstalled();
+        this.#checkServiceInstalled();
 
         if (this.pid()) {
             console.warn('Matterbridge Service Already Running!');
@@ -109,7 +106,7 @@ export class MacPlatform extends PlatformCommands {
 
     stop(): void {
         this.checkRoot();
-        this.#checkInstalled();
+        this.#checkServiceInstalled();
 
         if (this.pid()) {
             console.info('Stopping Matterbridge Service...');
@@ -136,8 +133,8 @@ export class MacPlatform extends PlatformCommands {
         execFileSync('tail', ['-f', '-n', '32', `${matterbridgeStoragePath}/matterbridge.log`], { stdio: 'inherit' });
     }
 
-    #checkInstalled(): void {
-        super.checkInstalled(this.#plist);
+    #checkServiceInstalled(): void {
+        super.checkServiceInstalled(this.#plist);
     }
 
     #getUserInfo(): UserInfo<string> {

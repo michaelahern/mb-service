@@ -9,16 +9,8 @@ export class LinuxPlatform extends PlatformCommands {
 
     install(): void {
         this.checkRoot();
+        const matterbridgePath = this.checkMatterbridgeInstalled();
         const userInfo = this.#getUserInfo();
-
-        // Check if Matterbridge is installed globally
-        const npmGlobalPrefix = execFileSync('npm', ['prefix', '-g', '--silent']).toString().trim();
-        const matterbridgePath = resolve(npmGlobalPrefix, 'bin', 'matterbridge');
-        if (!existsSync(matterbridgePath)) {
-            console.error('Matterbridge is not installed globally!');
-            console.error('npm install -g matterbridge');
-            process.exit(1);
-        }
 
         // Create Matterbridge Plugin and Storage directories
         const matterbridgePluginPath = resolve(userInfo.homedir, 'Matterbridge');
@@ -74,7 +66,7 @@ export class LinuxPlatform extends PlatformCommands {
 
     start(): void {
         this.checkRoot();
-        this.#checkInstalled();
+        this.#checkServiceInstalled();
 
         console.info('Starting Matterbridge Service...');
         execFileSync('systemctl', ['start', 'matterbridge']);
@@ -82,7 +74,7 @@ export class LinuxPlatform extends PlatformCommands {
 
     stop(): void {
         this.checkRoot();
-        this.#checkInstalled();
+        this.#checkServiceInstalled();
 
         console.info('Stopping Matterbridge Service...');
         execFileSync('systemctl', ['stop', 'matterbridge']);
@@ -106,8 +98,8 @@ export class LinuxPlatform extends PlatformCommands {
         execFileSync('journalctl', ['-u', 'matterbridge', '-n', '32', '-f', '--output', 'cat'], { stdio: 'inherit' });
     }
 
-    #checkInstalled(): void {
-        this.checkInstalled(this.#systemdService);
+    #checkServiceInstalled(): void {
+        this.checkServiceInstalled(this.#systemdService);
     }
 
     #getUserInfo(): UserInfo<string> {

@@ -1,5 +1,7 @@
+import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { networkInterfaces } from 'node:os';
+import { resolve } from 'node:path';
 
 export abstract class PlatformCommands {
     abstract install(): void;
@@ -42,7 +44,20 @@ export abstract class PlatformCommands {
         }
     }
 
-    protected checkInstalled(path: string): void {
+    protected checkMatterbridgeInstalled(): string {
+        const npmGlobalPrefix = execFileSync('npm', ['prefix', '-g', '--silent']).toString().trim();
+        const matterbridgePath = resolve(npmGlobalPrefix, 'bin', 'matterbridge');
+
+        if (!existsSync(matterbridgePath)) {
+            console.error('Matterbridge is not installed globally!');
+            console.error('npm install -g matterbridge');
+            process.exit(1);
+        }
+
+        return matterbridgePath;
+    }
+
+    protected checkServiceInstalled(path: string): void {
         if (!existsSync(path)) {
             console.error('Matterbridge Service Not Installed!');
             console.error('sudo mb-service install');
