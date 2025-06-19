@@ -1,5 +1,5 @@
 import { execFileSync, execSync } from 'node:child_process';
-import { chownSync, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
+import { chownSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { UserInfo, userInfo } from 'node:os';
 import { resolve } from 'node:path';
 import { PlatformCommands } from './platform.js';
@@ -12,7 +12,8 @@ export class LinuxPlatform extends PlatformCommands {
         const userInfo = this.#getUserInfo();
 
         // Check if Matterbridge is installed globally
-        const matterbridgePath = execSync('eval echo "$(npm prefix -g --silent)/bin/matterbridge"').toString().trim();
+        const npmGlobalPrefix = execFileSync('npm', ['prefix', '-g', '--silent']).toString().trim();
+        const matterbridgePath = resolve(npmGlobalPrefix, 'bin', 'matterbridge');
         if (!existsSync(matterbridgePath)) {
             console.error('Matterbridge is not installed globally!');
             console.error('npm install -g matterbridge');
@@ -140,8 +141,10 @@ export class LinuxPlatform extends PlatformCommands {
 
             execSync(`echo '${sudoersEntry}' | sudo EDITOR='tee -a' visudo`);
         }
-        catch (error: Error) {
-            console.error('Failed to update /etc/sudoers:', error.message);
+        catch (error: unknown) {
+            if (error instanceof Error) {
+                console.error('Failed to update /etc/sudoers:', error.message);
+            }
         }
     }
 }
