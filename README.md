@@ -7,7 +7,7 @@
 
 A service management command-line utility for [Matterbridge](https://github.com/Luligu/matterbridge/), inspired by [Homebridge's](https://github.com/homebridge/homebridge-config-ui-x/wiki/Homebridge-Service-Command) `hb-service`.               
 
-_This is currently experimental and only supports macOS with a default configuration at the moment!_
+_This is currently experimental and only supports Linux & macOS with a default configuration at the moment!_
 
 ```
 % npm install -g matterbridge mb-service
