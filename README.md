@@ -24,9 +24,13 @@ Commands:
   pid           Get the process id of the Matterbridge service
   tail          Tail the Matterbridge log file
 
-Options:
+Global Options:
   -h, --help
   -v, --version
+
+Install Options:
+  --frontend <port>
+  --ssl
 
 % sudo mb-service install
 Matterbridge Service Installed!
