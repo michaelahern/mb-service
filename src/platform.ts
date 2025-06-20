@@ -1,20 +1,25 @@
-import { execFileSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
-import { networkInterfaces } from 'node:os';
+import { execFileSync, execSync } from 'node:child_process';
+import { chownSync, existsSync, mkdirSync } from 'node:fs';
+import { UserInfo, networkInterfaces, userInfo } from 'node:os';
 import { resolve } from 'node:path';
 
 export abstract class PlatformCommands {
-    abstract install(): void;
+    abstract install(args: string[]): void;
     abstract uninstall(): void;
     abstract start(): void;
     abstract stop(): void;
     abstract pid(): string | null;
     abstract tail(): void;
 
-    postinstall() {
+    postinstall(args: string[]) {
+        let port = '8283';
+        if (args.includes('-frontend')) {
+            port = args[args.indexOf('-frontend') + 1];
+        }
+
         console.log();
         console.log('Manage Matterbridge in your browser at:');
-        console.log(` * http://localhost:8283`);
+        console.log(` * http://localhost:${port}`);
 
         for (const [, interfaceDetails] of Object.entries(networkInterfaces())) {
             if (!interfaceDetails) {
@@ -26,10 +31,10 @@ export abstract class PlatformCommands {
 
             if (ipv4Address || ipv6Address) {
                 if (ipv4Address) {
-                    console.log(` * http://${ipv4Address}:8283`);
+                    console.log(` * http://${ipv4Address}:${port}`);
                 }
                 if (ipv6Address) {
-                    console.log(` * http://[${ipv6Address}]:8283`);
+                    console.log(` * http://[${ipv6Address}]:${port}`);
                 }
                 break;
             }
@@ -49,7 +54,7 @@ export abstract class PlatformCommands {
         const matterbridgePath = resolve(npmGlobalPrefix, 'bin', 'matterbridge');
 
         if (!existsSync(matterbridgePath)) {
-            console.error('Matterbridge is not installed globally!');
+            console.error('Matterbridge Not Installed!');
             console.error('npm install -g matterbridge');
             process.exit(1);
         }
@@ -63,5 +68,33 @@ export abstract class PlatformCommands {
             console.error('sudo mb-service install');
             process.exit(1);
         }
+    }
+
+    protected getUserInfo(): UserInfo<string> {
+        if (process.env.SUDO_USER && process.env.SUDO_UID && process.env.SUDO_GID) {
+            return {
+                username: process.env.SUDO_USER,
+                uid: Number.parseInt(process.env.SUDO_UID),
+                gid: Number.parseInt(process.env.SUDO_GID),
+                shell: null,
+                homedir: execSync(`eval echo ~"${process.env.SUDO_USER}"`).toString().trim()
+            };
+        }
+
+        return userInfo();
+    }
+
+    protected mkdirMatterbridgePaths(): string {
+        const userInfo = this.getUserInfo();
+
+        const matterbridgePluginPath = resolve(userInfo.homedir, 'Matterbridge');
+        mkdirSync(matterbridgePluginPath, { recursive: true });
+        chownSync(matterbridgePluginPath, userInfo.uid, userInfo.gid);
+
+        const matterbridgeStoragePath = resolve(userInfo.homedir, '.matterbridge');
+        mkdirSync(matterbridgeStoragePath, { recursive: true });
+        chownSync(matterbridgeStoragePath, userInfo.uid, userInfo.gid);
+
+        return matterbridgeStoragePath;
     }
 }

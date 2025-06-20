@@ -1,6 +1,5 @@
-import { execFileSync, execSync } from 'node:child_process';
-import { chownSync, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
-import { UserInfo, userInfo } from 'node:os';
+import { execFileSync } from 'node:child_process';
+import { existsSync, unlinkSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
 
@@ -9,29 +8,24 @@ import { PlatformCommands } from './platform.js';
 export class MacPlatform extends PlatformCommands {
     #plist = '/Library/LaunchDaemons/com.matterbridge.plist';
 
-    install(): void {
+    install(args: string[]): void {
         this.checkRoot();
-        const matterbridgePath = this.checkMatterbridgeInstalled();
-        const userInfo = this.#getUserInfo();
-
-        // Create Matterbridge Plugin and Storage directories
-        const matterbridgePluginPath = resolve(userInfo.homedir, 'Matterbridge');
-        this.#mkdirPath(matterbridgePluginPath, userInfo);
-
-        const matterbridgeStoragePath = resolve(userInfo.homedir, '.matterbridge');
-        this.#mkdirPath(matterbridgeStoragePath, userInfo);
+        const matterbridgeBinPath = this.checkMatterbridgeInstalled();
+        const matterbridgeStoragePath = this.mkdirMatterbridgePaths();
+        const userInfo = this.getUserInfo();
 
         // Check NPM global modules path permissions and change if necessary
-        const npmGlobalModulesPath = execSync('eval echo "$(npm prefix -g --silent)/lib/node_modules"').toString().trim();
+        const npmGlobalPrefix = execFileSync('npm', ['prefix', '-g', '--silent']).toString().trim();
+        const npmGlobalModulesPath = resolve(npmGlobalPrefix, 'lib', 'node_modules');
         try {
-            execSync(`eval test -w "${npmGlobalModulesPath}"`, {
+            execFileSync('test', ['-w', npmGlobalModulesPath], {
                 uid: userInfo.uid,
                 gid: userInfo.gid
             });
         }
         catch {
             try {
-                execSync(`chown -R ${userInfo.uid}:${userInfo.gid} "${npmGlobalModulesPath}"`);
+                execFileSync('chown', ['-R', `${userInfo.uid}:${userInfo.gid}`, npmGlobalModulesPath]);
             }
             catch {
                 console.error('User not able to write to the NPM Global Modules Path!');
@@ -50,8 +44,8 @@ export class MacPlatform extends PlatformCommands {
             `    <string>com.matterbridge</string>`,
             '    <key>ProgramArguments</key>',
             '    <array>',
-            `         <string>${matterbridgePath}</string>`,
-            `         <string>-service</string>`,
+            `         <string>${matterbridgeBinPath}</string>`,
+            ...args.map(arg => `         <string>${arg}</string>`),
             '    </array>',
             '    <key>KeepAlive</key>',
             '    <true/>',
@@ -77,7 +71,7 @@ export class MacPlatform extends PlatformCommands {
         writeFileSync(this.#plist, plistFileContents);
         console.info('Matterbridge Service Installed!');
         this.start();
-        this.postinstall();
+        this.postinstall(args);
     }
 
     uninstall(): void {
@@ -129,30 +123,11 @@ export class MacPlatform extends PlatformCommands {
     }
 
     tail(): void {
-        const matterbridgeStoragePath = resolve(this.#getUserInfo().homedir, '.matterbridge');
+        const matterbridgeStoragePath = resolve(this.getUserInfo().homedir, '.matterbridge');
         execFileSync('tail', ['-f', '-n', '32', `${matterbridgeStoragePath}/matterbridge.log`], { stdio: 'inherit' });
     }
 
     #checkServiceInstalled(): void {
         super.checkServiceInstalled(this.#plist);
-    }
-
-    #getUserInfo(): UserInfo<string> {
-        if (process.env.SUDO_USER && process.env.SUDO_UID && process.env.SUDO_GID) {
-            return {
-                username: process.env.SUDO_USER,
-                uid: Number.parseInt(process.env.SUDO_UID),
-                gid: Number.parseInt(process.env.SUDO_GID),
-                shell: null,
-                homedir: execSync(`eval echo ~"${process.env.SUDO_USER}"`).toString().trim()
-            };
-        }
-
-        return userInfo();
-    }
-
-    #mkdirPath(path: string, userInfo: UserInfo<string>): void {
-        mkdirSync(path, { recursive: true });
-        chownSync(path, userInfo.uid, userInfo.gid);
     }
 }

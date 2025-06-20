@@ -1,24 +1,17 @@
-import { execFileSync, execSync } from 'node:child_process';
-import { chownSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
-import { UserInfo, userInfo } from 'node:os';
-import { resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { chmodSync, existsSync, unlinkSync, writeFileSync } from 'node:fs';
+import { UserInfo } from 'node:os';
+
 import { PlatformCommands } from './platform.js';
 
 export class LinuxPlatform extends PlatformCommands {
     #systemdService = '/etc/systemd/system/matterbridge.service';
 
-    install(): void {
+    install(args: string[]): void {
         this.checkRoot();
-        const matterbridgePath = this.checkMatterbridgeInstalled();
-        const userInfo = this.#getUserInfo();
-
-        // Create Matterbridge Plugin and Storage directories
-        const matterbridgePluginPath = resolve(userInfo.homedir, 'Matterbridge');
-        this.#mkdirPath(matterbridgePluginPath, userInfo);
-
-        const matterbridgeStoragePath = resolve(userInfo.homedir, '.matterbridge');
-        this.#mkdirPath(matterbridgeStoragePath, userInfo);
-
+        const matterbridgeBinPath = this.checkMatterbridgeInstalled();
+        const matterbridgeStoragePath = this.mkdirMatterbridgePaths();
+        const userInfo = this.getUserInfo();
         this.#configSudoers(userInfo);
 
         const systemdServiceFileContents = [
@@ -28,7 +21,7 @@ export class LinuxPlatform extends PlatformCommands {
             '',
             '[Service]',
             'Type=simple',
-            `ExecStart=${matterbridgePath} -service`,
+            `ExecStart=${matterbridgeBinPath} ${args.join(' ')}`,
             `WorkingDirectory=${matterbridgeStoragePath}`,
             'StandardOutput=inherit',
             'StandardError=inherit',
@@ -48,7 +41,7 @@ export class LinuxPlatform extends PlatformCommands {
         execFileSync('systemctl', ['enable', 'matterbridge']);
 
         this.start();
-        this.postinstall();
+        this.postinstall(args);
     }
 
     uninstall(): void {
@@ -99,44 +92,15 @@ export class LinuxPlatform extends PlatformCommands {
     }
 
     #checkServiceInstalled(): void {
-        this.checkServiceInstalled(this.#systemdService);
-    }
-
-    #getUserInfo(): UserInfo<string> {
-        if (process.env.SUDO_USER && process.env.SUDO_UID && process.env.SUDO_GID) {
-            return {
-                username: process.env.SUDO_USER,
-                uid: Number.parseInt(process.env.SUDO_UID),
-                gid: Number.parseInt(process.env.SUDO_GID),
-                shell: null,
-                homedir: execSync(`eval echo ~"${process.env.SUDO_USER}"`).toString().trim()
-            };
-        }
-
-        return userInfo();
-    }
-
-    #mkdirPath(path: string, userInfo: UserInfo<string>): void {
-        mkdirSync(path, { recursive: true });
-        chownSync(path, userInfo.uid, userInfo.gid);
+        super.checkServiceInstalled(this.#systemdService);
     }
 
     #configSudoers(userInfo: UserInfo<string>) {
-        try {
-            const npmPath = execSync('which npm').toString().trim();
-            const sudoersEntry = `${userInfo.username}    ALL=(ALL) NOPASSWD:SETENV: ${npmPath}, /usr/bin/npm, /usr/local/bin/npm`;
-
-            const sudoers = readFileSync('/etc/sudoers', 'utf-8');
-            if (sudoers.includes(sudoersEntry)) {
-                return;
-            }
-
-            execSync(`echo '${sudoersEntry}' | sudo EDITOR='tee -a' visudo`);
-        }
-        catch (error: unknown) {
-            if (error instanceof Error) {
-                console.error('Failed to update /etc/sudoers:', error.message);
-            }
-        }
+        const npmPath = execFileSync('which', ['npm']).toString().trim();
+        const sudoersPath = '/etc/sudoers.d/matterbridge';
+        const sudoersEntry = `${userInfo.username} ALL=(ALL) NOPASSWD: ${npmPath}\n`;
+        writeFileSync(sudoersPath, sudoersEntry);
+        chmodSync(sudoersPath, 0o440);
+        execFileSync('visudo', ['-c']);
     }
 }

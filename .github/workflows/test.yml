@@ -14,6 +14,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 24.x
+      - run: sudo chmod 440 /etc/sudoers.d/runner
       - run: sudo npm install -g matterbridge
       - run: npm ci
       - run: npm run build
@@ -28,6 +29,11 @@ jobs:
       - run: mb-service pid && systemctl status matterbridge
       - run: sleep 10
       - run: curl http://localhost:8283/
+      - run: sudo mb-service uninstall
+      - run: matterbridge -factoryreset
+      - run: sudo mb-service install --frontend 8383
+      - run: sleep 10
+      - run: curl http://localhost:8383/
       - run: sudo mb-service uninstall
   test-macos:
     runs-on: macos-latest
@@ -56,4 +62,9 @@ jobs:
       - run: mb-service pid && launchctl print system/com.matterbridge
       - run: sleep 10
       - run: curl http://localhost:8283/
+      - run: sudo mb-service uninstall
+      - run: matterbridge -factoryreset
+      - run: sudo mb-service install --frontend 8383
+      - run: sleep 10
+      - run: curl http://localhost:8383/
       - run: sudo mb-service uninstall

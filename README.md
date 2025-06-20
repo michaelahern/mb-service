@@ -7,8 +7,6 @@
 
 A service management command-line utility for [Matterbridge](https://github.com/Luligu/matterbridge/), inspired by [Homebridge's](https://github.com/homebridge/homebridge-config-ui-x/wiki/Homebridge-Service-Command) `hb-service`.               
 
-_This is currently experimental and only supports Linux & macOS with a default configuration at the moment!_
-
 ```
 % npm install -g matterbridge mb-service
 
@@ -24,9 +22,13 @@ Commands:
   pid           Get the process id of the Matterbridge service
   tail          Tail the Matterbridge log file
 
-Options:
+Global Options:
   -h, --help
   -v, --version
+
+Install Options:
+  --frontend <port>
+  --ssl
 
 % sudo mb-service install
 Matterbridge Service Installed!
