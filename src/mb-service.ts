@@ -12,7 +12,10 @@ async function main() {
         args: process.argv.slice(2),
         options: {
             help: { type: 'boolean', short: 'h' },
-            version: { type: 'boolean', short: 'v' } },
+            version: { type: 'boolean', short: 'v' },
+            frontend: { type: 'string' },
+            ssl: { type: 'boolean' }
+        },
         strict: false,
         allowPositionals: true
     });
@@ -42,10 +45,27 @@ async function main() {
             process.exit(2);
     }
 
+    const installArgs: string[] = ['-service'];
+
+    if (args.values.frontend) {
+        if (typeof args.values.frontend === 'string' && /^\d+$/.test(args.values.frontend)) {
+            installArgs.push('-frontend', args.values.frontend);
+        }
+        else {
+            console.error(`Specify a valid number in --frontend [port]`);
+            help();
+            process.exit(1);
+        }
+    }
+
+    if (args.values.ssl) {
+        installArgs.push('-ssl');
+    }
+
     const command = args.positionals[0];
     switch (command) {
         case 'install':
-            platformCommands.install();
+            platformCommands.install(installArgs);
             break;
         case 'uninstall':
             platformCommands.uninstall();
@@ -95,9 +115,13 @@ function help() {
     console.log('  pid           Get the process id of the Matterbridge service');
     console.log('  tail          Tail the Matterbridge log file');
     console.log('');
-    console.log('Options:');
+    console.log('Global Options:');
     console.log('  -h, --help');
     console.log('  -v, --version');
+    console.log('');
+    console.log('Install Options:');
+    console.log('  --frontend <port>');
+    console.log('  --ssl');
     console.log('');
 }
 

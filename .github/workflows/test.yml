@@ -29,6 +29,10 @@ jobs:
       - run: sleep 10
       - run: curl http://localhost:8283/
       - run: sudo mb-service uninstall
+      - run: sudo mb-service install --frontend 8383
+      - run: sleep 10
+      - run: curl http://localhost:8383/
+      - run: sudo mb-service uninstall
   test-macos:
     runs-on: macos-latest
     steps:
@@ -56,4 +60,8 @@ jobs:
       - run: mb-service pid && launchctl print system/com.matterbridge
       - run: sleep 10
       - run: curl http://localhost:8283/
+      - run: sudo mb-service uninstall
+      - run: sudo mb-service install --frontend 8383
+      - run: sleep 10
+      - run: curl http://localhost:8383/
       - run: sudo mb-service uninstall

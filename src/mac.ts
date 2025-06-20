@@ -9,7 +9,7 @@ import { PlatformCommands } from './platform.js';
 export class MacPlatform extends PlatformCommands {
     #plist = '/Library/LaunchDaemons/com.matterbridge.plist';
 
-    install(): void {
+    install(args: string[]): void {
         this.checkRoot();
         const matterbridgePath = this.checkMatterbridgeInstalled();
         const userInfo = this.#getUserInfo();
@@ -51,7 +51,7 @@ export class MacPlatform extends PlatformCommands {
             '    <key>ProgramArguments</key>',
             '    <array>',
             `         <string>${matterbridgePath}</string>`,
-            `         <string>-service</string>`,
+            ...args.map(arg => `         <string>${arg}</string>`),
             '    </array>',
             '    <key>KeepAlive</key>',
             '    <true/>',
@@ -77,7 +77,7 @@ export class MacPlatform extends PlatformCommands {
         writeFileSync(this.#plist, plistFileContents);
         console.info('Matterbridge Service Installed!');
         this.start();
-        this.postinstall();
+        this.postinstall(args);
     }
 
     uninstall(): void {

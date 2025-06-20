@@ -7,7 +7,7 @@ import { PlatformCommands } from './platform.js';
 export class LinuxPlatform extends PlatformCommands {
     #systemdService = '/etc/systemd/system/matterbridge.service';
 
-    install(): void {
+    install(args: string[]): void {
         this.checkRoot();
         const matterbridgePath = this.checkMatterbridgeInstalled();
         const userInfo = this.#getUserInfo();
@@ -28,7 +28,7 @@ export class LinuxPlatform extends PlatformCommands {
             '',
             '[Service]',
             'Type=simple',
-            `ExecStart=${matterbridgePath} -service`,
+            `ExecStart=${matterbridgePath} ${args.join(' ')}`,
             `WorkingDirectory=${matterbridgeStoragePath}`,
             'StandardOutput=inherit',
             'StandardError=inherit',
@@ -48,7 +48,7 @@ export class LinuxPlatform extends PlatformCommands {
         execFileSync('systemctl', ['enable', 'matterbridge']);
 
         this.start();
-        this.postinstall();
+        this.postinstall(args);
     }
 
     uninstall(): void {

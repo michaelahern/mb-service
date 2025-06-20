@@ -4,17 +4,22 @@ import { networkInterfaces } from 'node:os';
 import { resolve } from 'node:path';
 
 export abstract class PlatformCommands {
-    abstract install(): void;
+    abstract install(args: string[]): void;
     abstract uninstall(): void;
     abstract start(): void;
     abstract stop(): void;
     abstract pid(): string | null;
     abstract tail(): void;
 
-    postinstall() {
+    postinstall(args: string[]) {
+        let port = '8283';
+        if (args.includes('-frontend')) {
+            port = args[args.indexOf('-frontend') + 1];
+        }
+
         console.log();
         console.log('Manage Matterbridge in your browser at:');
-        console.log(` * http://localhost:8283`);
+        console.log(` * http://localhost:${port}`);
 
         for (const [, interfaceDetails] of Object.entries(networkInterfaces())) {
             if (!interfaceDetails) {
@@ -26,10 +31,10 @@ export abstract class PlatformCommands {
 
             if (ipv4Address || ipv6Address) {
                 if (ipv4Address) {
-                    console.log(` * http://${ipv4Address}:8283`);
+                    console.log(` * http://${ipv4Address}:${port}`);
                 }
                 if (ipv6Address) {
-                    console.log(` * http://[${ipv6Address}]:8283`);
+                    console.log(` * http://[${ipv6Address}]:${port}`);
                 }
                 break;
             }
@@ -49,7 +54,7 @@ export abstract class PlatformCommands {
         const matterbridgePath = resolve(npmGlobalPrefix, 'bin', 'matterbridge');
 
         if (!existsSync(matterbridgePath)) {
-            console.error('Matterbridge is not installed globally!');
+            console.error('Matterbridge Not Installed!');
             console.error('npm install -g matterbridge');
             process.exit(1);
         }
