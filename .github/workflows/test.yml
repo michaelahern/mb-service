@@ -62,6 +62,7 @@ jobs:
       - run: curl http://localhost:8283/
       - run: sudo mb-service uninstall
       - run: sudo mb-service install --frontend 8383
+      - run: more /Library/LaunchDaemons/com.matterbridge.plist
       - run: sleep 10
       - run: curl http://localhost:8383/
       - run: sudo mb-service uninstall
