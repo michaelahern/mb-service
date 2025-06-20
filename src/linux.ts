@@ -109,7 +109,7 @@ export class LinuxPlatform extends PlatformCommands {
 
     #configSudoers(userInfo: UserInfo<string>) {
         try {
-            const npmPath = execSync('which npm').toString().trim();
+            const npmPath = execFileSync('which', ['npm']).toString().trim();
             const sudoersEntry = `${userInfo.username}    ALL=(ALL) NOPASSWD:SETENV: ${npmPath}, /usr/bin/npm, /usr/local/bin/npm`;
 
             const sudoers = readFileSync('/etc/sudoers', 'utf-8');
