@@ -92,7 +92,7 @@ export class LinuxPlatform extends PlatformCommands {
     }
 
     #checkServiceInstalled(): void {
-        this.checkServiceInstalled(this.#systemdService);
+        super.checkServiceInstalled(this.#systemdService);
     }
 
     #configSudoers(userInfo: UserInfo<string>) {
