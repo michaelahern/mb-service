@@ -1,5 +1,5 @@
-import { execFileSync, execSync } from 'node:child_process';
-import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { chmodSync, existsSync, unlinkSync, writeFileSync } from 'node:fs';
 import { UserInfo } from 'node:os';
 
 import { PlatformCommands } from './platform.js';
@@ -12,7 +12,6 @@ export class LinuxPlatform extends PlatformCommands {
         const matterbridgeBinPath = this.checkMatterbridgeInstalled();
         const matterbridgeStoragePath = this.mkdirMatterbridgePaths();
         const userInfo = this.getUserInfo();
-
         this.#configSudoers(userInfo);
 
         const systemdServiceFileContents = [
@@ -97,21 +96,11 @@ export class LinuxPlatform extends PlatformCommands {
     }
 
     #configSudoers(userInfo: UserInfo<string>) {
-        try {
-            const npmPath = execFileSync('which', ['npm']).toString().trim();
-            const sudoersEntry = `${userInfo.username}    ALL=(ALL) NOPASSWD:SETENV: ${npmPath}, /usr/bin/npm, /usr/local/bin/npm`;
-
-            const sudoers = readFileSync('/etc/sudoers', 'utf-8');
-            if (sudoers.includes(sudoersEntry)) {
-                return;
-            }
-
-            execSync(`echo '${sudoersEntry}' | sudo EDITOR='tee -a' visudo`);
-        }
-        catch (error: unknown) {
-            if (error instanceof Error) {
-                console.error('Failed to update /etc/sudoers:', error.message);
-            }
-        }
+        const npmPath = execFileSync('which', ['npm']).toString().trim();
+        const sudoersPath = '/etc/sudoers.d/matterbridge';
+        const sudoersEntry = `${userInfo.username} ALL=(ALL) NOPASSWD: ${npmPath}\n`;
+        writeFileSync(sudoersPath, sudoersEntry);
+        chmodSync(sudoersPath, 0o440);
+        execFileSync('visudo', ['-c']);
     }
 }
