@@ -15,7 +15,8 @@ export class MacPlatform extends PlatformCommands {
         const userInfo = this.getUserInfo();
 
         // Check NPM global modules path permissions and change if necessary
-        const npmGlobalModulesPath = execSync('eval echo "$(npm prefix -g --silent)/lib/node_modules"').toString().trim();
+        const npmGlobalPrefix = execFileSync('npm', ['prefix', '-g', '--silent']).toString().trim();
+        const npmGlobalModulesPath = resolve(npmGlobalPrefix, 'lib', 'node_modules');
         try {
             execSync(`eval test -w "${npmGlobalModulesPath}"`, {
                 uid: userInfo.uid,
@@ -24,7 +25,7 @@ export class MacPlatform extends PlatformCommands {
         }
         catch {
             try {
-                execSync(`chown -R ${userInfo.uid}:${userInfo.gid} "${npmGlobalModulesPath}"`);
+                execFileSync('chown', ['-R', `${userInfo.uid}:${userInfo.gid}`, npmGlobalModulesPath]);
             }
             catch {
                 console.error('User not able to write to the NPM Global Modules Path!');
