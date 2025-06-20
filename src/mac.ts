@@ -1,4 +1,4 @@
-import { execFileSync, execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { existsSync, unlinkSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
@@ -18,7 +18,7 @@ export class MacPlatform extends PlatformCommands {
         const npmGlobalPrefix = execFileSync('npm', ['prefix', '-g', '--silent']).toString().trim();
         const npmGlobalModulesPath = resolve(npmGlobalPrefix, 'lib', 'node_modules');
         try {
-            execSync(`eval test -w "${npmGlobalModulesPath}"`, {
+            execFileSync('test', ['-w', npmGlobalModulesPath], {
                 uid: userInfo.uid,
                 gid: userInfo.gid
             });
