@@ -1,4 +1,4 @@
-import { execFileSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { UserInfo, networkInterfaces, userInfo } from 'node:os';
 import { resolve } from 'node:path';
@@ -77,7 +77,7 @@ export abstract class PlatformCommands {
                 uid: Number.parseInt(process.env.SUDO_UID),
                 gid: Number.parseInt(process.env.SUDO_GID),
                 shell: null,
-                homedir: execFileSync('echo', [`~"${process.env.SUDO_USER}"`]).toString().trim()
+                homedir: execSync(`eval echo ~"${process.env.SUDO_USER}"`).toString().trim()
             };
         }
 
