@@ -1,6 +1,6 @@
 import { execFileSync, execSync } from 'node:child_process';
 import { chownSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
-import { UserInfo, userInfo } from 'node:os';
+import { UserInfo } from 'node:os';
 import { resolve } from 'node:path';
 import { PlatformCommands } from './platform.js';
 
@@ -10,7 +10,7 @@ export class LinuxPlatform extends PlatformCommands {
     install(args: string[]): void {
         this.checkRoot();
         const matterbridgePath = this.checkMatterbridgeInstalled();
-        const userInfo = this.#getUserInfo();
+        const userInfo = this.getUserInfo();
 
         // Create Matterbridge Plugin and Storage directories
         const matterbridgePluginPath = resolve(userInfo.homedir, 'Matterbridge');
@@ -100,20 +100,6 @@ export class LinuxPlatform extends PlatformCommands {
 
     #checkServiceInstalled(): void {
         this.checkServiceInstalled(this.#systemdService);
-    }
-
-    #getUserInfo(): UserInfo<string> {
-        if (process.env.SUDO_USER && process.env.SUDO_UID && process.env.SUDO_GID) {
-            return {
-                username: process.env.SUDO_USER,
-                uid: Number.parseInt(process.env.SUDO_UID),
-                gid: Number.parseInt(process.env.SUDO_GID),
-                shell: null,
-                homedir: execSync(`eval echo ~"${process.env.SUDO_USER}"`).toString().trim()
-            };
-        }
-
-        return userInfo();
     }
 
     #mkdirPath(path: string, userInfo: UserInfo<string>): void {

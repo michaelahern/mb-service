@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
-import { networkInterfaces } from 'node:os';
+import { UserInfo, networkInterfaces, userInfo } from 'node:os';
 import { resolve } from 'node:path';
 
 export abstract class PlatformCommands {
@@ -68,5 +68,19 @@ export abstract class PlatformCommands {
             console.error('sudo mb-service install');
             process.exit(1);
         }
+    }
+
+    protected getUserInfo(): UserInfo<string> {
+        if (process.env.SUDO_USER && process.env.SUDO_UID && process.env.SUDO_GID) {
+            return {
+                username: process.env.SUDO_USER,
+                uid: Number.parseInt(process.env.SUDO_UID),
+                gid: Number.parseInt(process.env.SUDO_GID),
+                shell: null,
+                homedir: execFileSync('echo', [`~"${process.env.SUDO_USER}"`]).toString().trim()
+            };
+        }
+
+        return userInfo();
     }
 }
