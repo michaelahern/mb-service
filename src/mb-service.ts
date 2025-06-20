@@ -52,7 +52,7 @@ async function main() {
             installArgs.push('-frontend', args.values.frontend);
         }
         else {
-            console.error(`Specify a valid number in --frontend [port]`);
+            console.error(`Specify a valid number in --frontend <port>`);
             help();
             process.exit(1);
         }
