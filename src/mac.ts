@@ -1,6 +1,5 @@
 import { execFileSync, execSync } from 'node:child_process';
-import { chownSync, existsSync, mkdirSync, unlinkSync, writeFileSync } from 'node:fs';
-import { UserInfo } from 'node:os';
+import { existsSync, unlinkSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import process from 'node:process';
 
@@ -11,15 +10,9 @@ export class MacPlatform extends PlatformCommands {
 
     install(args: string[]): void {
         this.checkRoot();
-        const matterbridgePath = this.checkMatterbridgeInstalled();
+        const matterbridgeBinPath = this.checkMatterbridgeInstalled();
+        const matterbridgeStoragePath = this.mkdirMatterbridgePaths();
         const userInfo = this.getUserInfo();
-
-        // Create Matterbridge Plugin and Storage directories
-        const matterbridgePluginPath = resolve(userInfo.homedir, 'Matterbridge');
-        this.#mkdirPath(matterbridgePluginPath, userInfo);
-
-        const matterbridgeStoragePath = resolve(userInfo.homedir, '.matterbridge');
-        this.#mkdirPath(matterbridgeStoragePath, userInfo);
 
         // Check NPM global modules path permissions and change if necessary
         const npmGlobalModulesPath = execSync('eval echo "$(npm prefix -g --silent)/lib/node_modules"').toString().trim();
@@ -50,7 +43,7 @@ export class MacPlatform extends PlatformCommands {
             `    <string>com.matterbridge</string>`,
             '    <key>ProgramArguments</key>',
             '    <array>',
-            `         <string>${matterbridgePath}</string>`,
+            `         <string>${matterbridgeBinPath}</string>`,
             ...args.map(arg => `         <string>${arg}</string>`),
             '    </array>',
             '    <key>KeepAlive</key>',
@@ -135,10 +128,5 @@ export class MacPlatform extends PlatformCommands {
 
     #checkServiceInstalled(): void {
         super.checkServiceInstalled(this.#plist);
-    }
-
-    #mkdirPath(path: string, userInfo: UserInfo<string>): void {
-        mkdirSync(path, { recursive: true });
-        chownSync(path, userInfo.uid, userInfo.gid);
     }
 }

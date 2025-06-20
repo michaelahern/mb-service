@@ -1,7 +1,7 @@
 import { execFileSync, execSync } from 'node:child_process';
-import { chownSync, existsSync, mkdirSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, unlinkSync, writeFileSync } from 'node:fs';
 import { UserInfo } from 'node:os';
-import { resolve } from 'node:path';
+
 import { PlatformCommands } from './platform.js';
 
 export class LinuxPlatform extends PlatformCommands {
@@ -9,15 +9,9 @@ export class LinuxPlatform extends PlatformCommands {
 
     install(args: string[]): void {
         this.checkRoot();
-        const matterbridgePath = this.checkMatterbridgeInstalled();
+        const matterbridgeBinPath = this.checkMatterbridgeInstalled();
+        const matterbridgeStoragePath = this.mkdirMatterbridgePaths();
         const userInfo = this.getUserInfo();
-
-        // Create Matterbridge Plugin and Storage directories
-        const matterbridgePluginPath = resolve(userInfo.homedir, 'Matterbridge');
-        this.#mkdirPath(matterbridgePluginPath, userInfo);
-
-        const matterbridgeStoragePath = resolve(userInfo.homedir, '.matterbridge');
-        this.#mkdirPath(matterbridgeStoragePath, userInfo);
 
         this.#configSudoers(userInfo);
 
@@ -28,7 +22,7 @@ export class LinuxPlatform extends PlatformCommands {
             '',
             '[Service]',
             'Type=simple',
-            `ExecStart=${matterbridgePath} ${args.join(' ')}`,
+            `ExecStart=${matterbridgeBinPath} ${args.join(' ')}`,
             `WorkingDirectory=${matterbridgeStoragePath}`,
             'StandardOutput=inherit',
             'StandardError=inherit',
@@ -100,11 +94,6 @@ export class LinuxPlatform extends PlatformCommands {
 
     #checkServiceInstalled(): void {
         this.checkServiceInstalled(this.#systemdService);
-    }
-
-    #mkdirPath(path: string, userInfo: UserInfo<string>): void {
-        mkdirSync(path, { recursive: true });
-        chownSync(path, userInfo.uid, userInfo.gid);
     }
 
     #configSudoers(userInfo: UserInfo<string>) {

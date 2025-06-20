@@ -1,5 +1,5 @@
 import { execFileSync, execSync } from 'node:child_process';
-import { existsSync } from 'node:fs';
+import { chownSync, existsSync, mkdirSync } from 'node:fs';
 import { UserInfo, networkInterfaces, userInfo } from 'node:os';
 import { resolve } from 'node:path';
 
@@ -82,5 +82,19 @@ export abstract class PlatformCommands {
         }
 
         return userInfo();
+    }
+
+    protected mkdirMatterbridgePaths(): string {
+        const userInfo = this.getUserInfo();
+
+        const matterbridgePluginPath = resolve(userInfo.homedir, 'Matterbridge');
+        mkdirSync(matterbridgePluginPath, { recursive: true });
+        chownSync(matterbridgePluginPath, userInfo.uid, userInfo.gid);
+
+        const matterbridgeStoragePath = resolve(userInfo.homedir, '.matterbridge');
+        mkdirSync(matterbridgeStoragePath, { recursive: true });
+        chownSync(matterbridgeStoragePath, userInfo.uid, userInfo.gid);
+
+        return matterbridgeStoragePath;
     }
 }
