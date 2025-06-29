@@ -34,7 +34,7 @@ export class MacPlatform extends PlatformCommands {
             }
         }
 
-        // Add -nosudo given not required with above chown
+        // Ensure '-nosudo' flag is present since sudo is unnecessary after chown
         if (!args.includes('-nosudo')) {
             args.push('-nosudo');
         }
