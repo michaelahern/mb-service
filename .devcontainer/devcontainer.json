@@ -10,7 +10,7 @@
     }
   },
   "updateContentCommand": {
-    "matterbridge-install": "npm install -g matterbridge",
+    "matterbridge-install": "npm install -g matterbridge --omit=dev",
     "npm-install": "npm install"
   },
   "postStartCommand": {
