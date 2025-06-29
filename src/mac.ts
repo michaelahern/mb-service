@@ -34,6 +34,11 @@ export class MacPlatform extends PlatformCommands {
             }
         }
 
+        // Add -nosudo given not required with above chown
+        if (!args.includes('-nosudo')) {
+            args.push('-nosudo');
+        }
+
         // Create the launchd plist file
         const plistFileContents = [
             '<?xml version="1.0" encoding="UTF-8"?>',
