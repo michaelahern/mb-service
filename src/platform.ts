@@ -1,6 +1,6 @@
 import { execFileSync, execSync } from 'node:child_process';
 import { chownSync, existsSync, mkdirSync } from 'node:fs';
-import { UserInfo, networkInterfaces, userInfo } from 'node:os';
+import { type UserInfo, networkInterfaces, userInfo } from 'node:os';
 import { resolve } from 'node:path';
 
 export abstract class PlatformCommands {
@@ -14,7 +14,10 @@ export abstract class PlatformCommands {
     postinstall(args: string[]) {
         let port = '8283';
         if (args.includes('-frontend')) {
-            port = args[args.indexOf('-frontend') + 1];
+            const portIndex = args.indexOf('-frontend') + 1;
+            if (args[portIndex]) {
+                port = args[portIndex];
+            }
         }
 
         console.log();

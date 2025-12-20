@@ -117,7 +117,7 @@ export class MacPlatform extends PlatformCommands {
         try {
             const output = execFileSync('launchctl', ['print', 'system/com.matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
             const match = output.match(/pid = (\d+)/);
-            if (match) {
+            if (match && match[1]) {
                 return match[1];
             }
             return null;
