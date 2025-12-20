@@ -29,8 +29,8 @@
   "scripts": {
     "build": "npm run lint && tsc && chmod +x ./bin/mb-service.js",
     "clean": "rimraf ./bin",
-    "lint": "eslint src/**/*.ts --max-warnings=0",
-    "lint-fix": "eslint src/**/*.ts --max-warnings=0 --fix",
+    "lint": "eslint --max-warnings=0",
+    "lint-fix": "eslint --max-warnings=0 --fix",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
