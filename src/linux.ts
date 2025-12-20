@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
 import { chmodSync, existsSync, unlinkSync, writeFileSync } from 'node:fs';
-import { UserInfo } from 'node:os';
+import type { UserInfo } from 'node:os';
 
 import { PlatformCommands } from './platform.js';
 
@@ -77,7 +77,7 @@ export class LinuxPlatform extends PlatformCommands {
         try {
             const output = execFileSync('systemctl', ['show', '--property', 'MainPID', '--value', 'matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
             const match = output.match(/(\d+)/);
-            if (match && match[1] !== '0') {
+            if (match && match[1] && match[1] !== '0') {
                 return match[1];
             }
             return null;

@@ -1,7 +1,7 @@
 {
   "name": "mb-service",
   "displayName": "Matterbridge Service Command",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "A service management command-line utility for Matterbridge, inspired by Homebridge's 'hb-service'.",
   "keywords": [
     "matter",
@@ -29,14 +29,18 @@
   "scripts": {
     "build": "npm run lint && tsc && chmod +x ./bin/mb-service.js",
     "clean": "rimraf ./bin",
-    "lint": "eslint src/**/*.ts --max-warnings=0",
-    "lint-fix": "eslint src/**/*.ts --max-warnings=0 --fix",
+    "lint": "eslint --max-warnings=0",
+    "lint-fix": "eslint --max-warnings=0 --fix",
     "prepublishOnly": "npm run build"
   },
   "devDependencies": {
+    "@eslint/json": "^0",
+    "@eslint/markdown": "^7",
     "@stylistic/eslint-plugin": "^5",
     "@types/node": "^20",
     "eslint": "^9",
+    "eslint-plugin-jsonc": "^2",
+    "eslint-plugin-yml": "^1",
     "rimraf": "^6",
     "typescript": "~5.9",
     "typescript-eslint": "^8"
