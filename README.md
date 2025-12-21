@@ -10,7 +10,7 @@ A service management command-line utility for [Matterbridge](https://matterbridg
 This command-line utility is primarily focused on supporting the macOS platform, as that is my primary platform at home, but it does have experimental support for Linux. The author of [Matterbridge](https://matterbridge.io/) now has a dedicated utility for supporting Linux, [mb-service-linux](https://github.com/Luligu/mb-service-linux), which is a more mature option for Linux users.
 
 ```shell
-% npm install -g matterbridge mb-service --omit=dev
+% npm install -g matterbridge mb-service
 
 % mb-service
 Usage: mb-service <command> [options]
