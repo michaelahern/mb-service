@@ -19,22 +19,30 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: sudo npm link
-      - run: |
+      - name: "Test: mb-service -h"
+        run: |
           mb-service -h
           mb-service --help
-      - run: |
+      - name: "Test: mb-service -v"
+        run: |
           mb-service -v
           mb-service --version
-      - run: sudo mb-service install
-      - run: mb-service pid && systemctl status matterbridge
-      - run: sleep 10
-      - run: curl http://localhost:8283/
-      - run: sudo mb-service uninstall
-      - run: matterbridge -factoryreset
-      - run: sudo mb-service install --frontend 8383
-      - run: sleep 10
-      - run: curl http://localhost:8383/
-      - run: sudo mb-service uninstall
+      - name: "Test: Default Installation"
+        run: |
+          sudo mb-service install
+          mb-service pid
+          systemctl status matterbridge
+          sleep 8
+          curl http://localhost:8283/
+          sudo mb-service uninstall
+          matterbridge -factoryreset
+      - name: "Test: Custom Frontend Port"
+        run: |
+          sudo mb-service install --frontend 8383
+          sleep 8
+          curl http://localhost:8383/
+          sudo mb-service uninstall
+          matterbridge -factoryreset
   test-macos:
     runs-on: macos-latest
     steps:
@@ -46,25 +54,42 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm link
-      - run: |
+      - name: "Test: mb-service -h"
+        run: |
           mb-service -h
           mb-service --help
-      - run: |
+      - name: "Test: mb-service -v"
+        run: |
           mb-service -v
           mb-service --version
-      - run: |
+      - name: "Test Setup: Default Installation"
+        run: |
           sudo chown -R root:wheel "$(npm prefix -g --silent)/lib/node_modules"
           ls -la "$(npm prefix -g --silent)/lib"
-      - run: sudo mb-service install
-      - run: |
+      - name: "Test: Default Installation"
+        run: |
+          sudo mb-service install
           test -w "$(npm prefix -g --silent)/lib/node_modules"
           ls -la "$(npm prefix -g --silent)/lib"
-      - run: mb-service pid && launchctl print system/com.matterbridge
-      - run: sleep 10
-      - run: curl http://localhost:8283/
-      - run: sudo mb-service uninstall
-      - run: matterbridge -factoryreset
-      - run: sudo mb-service install --frontend 8383
-      - run: sleep 10
-      - run: curl http://localhost:8383/
-      - run: sudo mb-service uninstall
+          mb-service pid
+          launchctl print system/io.matterbridge
+          sleep 8
+          curl http://localhost:8283/
+          sudo mb-service uninstall
+          matterbridge -factoryreset
+      - name: "Test: Custom Frontend Port"
+        run: |
+          sudo mb-service install --frontend 8383
+          sleep 8
+          curl http://localhost:8383/
+          sudo mb-service uninstall
+          matterbridge -factoryreset
+      - name: "Test: Log Rotation"
+        run: |
+          dd if=/dev/zero of=$HOME/.matterbridge/matterbridge.log bs=1M count=11
+          sudo mb-service install
+          sleep 4
+          ls -la ~/.matterbridge
+          test -f ~/.matterbridge/matterbridge.log.0
+          sudo mb-service uninstall
+          matterbridge -factoryreset
