@@ -6,7 +6,7 @@ import process from 'node:process';
 import { PlatformCommands } from './platform.js';
 
 export class MacPlatform extends PlatformCommands {
-    #plist = '/Library/LaunchDaemons/io.matterbridge.plist';
+    #plistDaemon = '/Library/LaunchDaemons/io.matterbridge.plist';
     #plistLogrotate = '/Library/LaunchDaemons/io.matterbridge.logrotate.plist';
 
     install(args: string[]): void {
@@ -42,13 +42,13 @@ export class MacPlatform extends PlatformCommands {
         }
 
         // Create the launchd plist file
-        const plistFileContents = [
+        const plistDaemonFileContents = [
             '<?xml version="1.0" encoding="UTF-8"?>',
             '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
             '<plist version="1.0">',
             '<dict>',
             '    <key>Label</key>',
-            `    <string>matterbridge</string>`,
+            `    <string>io.matterbridge</string>`,
             '    <key>ProgramArguments</key>',
             '    <array>',
             `        <string>${matterbridgeBinPath}</string>`,
@@ -82,7 +82,7 @@ export class MacPlatform extends PlatformCommands {
             '<plist version="1.0">',
             '<dict>',
             '    <key>Label</key>',
-            `    <string>matterbridge.logrotate</string>`,
+            `    <string>io.matterbridge.logrotate</string>`,
             '    <key>ProgramArguments</key>',
             '    <array>',
             `        <string>/bin/sh</string>`,
@@ -99,7 +99,7 @@ export class MacPlatform extends PlatformCommands {
             '</plist>'
         ].filter(x => x).join('\n');
 
-        writeFileSync(this.#plist, plistFileContents);
+        writeFileSync(this.#plistDaemon, plistDaemonFileContents);
         writeFileSync(this.#plistLogrotate, plistLogRotateFileContents);
 
         console.info('Matterbridge Service Installed!');
@@ -111,8 +111,8 @@ export class MacPlatform extends PlatformCommands {
         this.checkRoot();
         this.stop();
 
-        if (existsSync(this.#plist)) {
-            unlinkSync(this.#plist);
+        if (existsSync(this.#plistDaemon)) {
+            unlinkSync(this.#plistDaemon);
         }
 
         if (existsSync(this.#plistLogrotate)) {
@@ -133,7 +133,7 @@ export class MacPlatform extends PlatformCommands {
 
         console.info('Starting Matterbridge Service...');
         execFileSync('launchctl', ['bootstrap', 'system', this.#plistLogrotate]);
-        execFileSync('launchctl', ['bootstrap', 'system', this.#plist]);
+        execFileSync('launchctl', ['bootstrap', 'system', this.#plistDaemon]);
     }
 
     stop(): void {
@@ -141,13 +141,13 @@ export class MacPlatform extends PlatformCommands {
         this.#checkServiceInstalled();
 
         console.info('Stopping Matterbridge Service...');
-        execFileSync('launchctl', ['bootout', 'system/matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] });
-        execFileSync('launchctl', ['bootout', 'system/matterbridge.logrotate'], { stdio: ['pipe', 'pipe', 'pipe'] });
+        execFileSync('launchctl', ['bootout', 'system/io.matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] });
+        execFileSync('launchctl', ['bootout', 'system/io.matterbridge.logrotate'], { stdio: ['pipe', 'pipe', 'pipe'] });
     }
 
     pid(): string | null {
         try {
-            const output = execFileSync('launchctl', ['print', 'system/matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
+            const output = execFileSync('launchctl', ['print', 'system/io.matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
             const match = output.match(/pid = (\d+)/);
             if (match && match[1]) {
                 return match[1];
@@ -165,7 +165,6 @@ export class MacPlatform extends PlatformCommands {
     }
 
     #checkServiceInstalled(): void {
-        super.checkServiceInstalled(this.#plist);
-        super.checkServiceInstalled(this.#plistLogrotate);
+        super.checkServiceInstalled(this.#plistDaemon);
     }
 }

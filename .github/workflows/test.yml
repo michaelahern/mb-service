@@ -69,9 +69,11 @@ jobs:
       - run: curl http://localhost:8383/
       - run: sudo mb-service uninstall
       - run: matterbridge -factoryreset
-      - run: |
+      - name: Log Rotation
+        run: |
           dd if=/dev/zero of=$HOME/.matterbridge/matterbridge.log bs=1M count=11
           ls -la ~/.matterbridge
           sudo mb-service install
           sleep 5
           ls -la ~/.matterbridge
+          test -f ~/.matterbridge/matterbridge.log.bakk
