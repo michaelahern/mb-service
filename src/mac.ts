@@ -41,7 +41,7 @@ export class MacPlatform extends PlatformCommands {
             args.push('-nosudo');
         }
 
-        // Create the launchd plist file
+        // Create the launchd plist file for the matterbridge daemon
         const plistDaemonFileContents = [
             '<?xml version="1.0" encoding="UTF-8"?>',
             '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
@@ -75,7 +75,7 @@ export class MacPlatform extends PlatformCommands {
             '</plist>'
         ].filter(x => x).join('\n');
 
-        // Create the launchd plist file
+        // Create the launchd plist file for log rotation
         const plistLogRotateFileContents = [
             '<?xml version="1.0" encoding="UTF-8"?>',
             '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
