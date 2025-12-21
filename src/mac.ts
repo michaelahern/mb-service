@@ -132,8 +132,16 @@ export class MacPlatform extends PlatformCommands {
         }
 
         console.info('Starting Matterbridge Service...');
+
+        try {
+            execFileSync('launchctl', ['bootstrap', 'system', this.#plistDaemon]);
+        }
+        catch (error) {
+            console.error('Failed to start Matterbridge Service!');
+            console.error(error);
+            process.exit(1);
+        }
         execFileSync('launchctl', ['bootstrap', 'system', this.#plistLogRotate]);
-        execFileSync('launchctl', ['bootstrap', 'system', this.#plistDaemon]);
     }
 
     stop(): void {
