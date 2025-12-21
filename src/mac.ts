@@ -145,11 +145,9 @@ export class MacPlatform extends PlatformCommands {
         this.checkRoot();
         this.#checkServiceInstalled();
 
-        // if (this.pid()) {
         console.info('Stopping Matterbridge Service...');
-        execFileSync('launchctl', ['bootout', 'system/matterbridge']);
-        execFileSync('launchctl', ['bootout', 'system/matterbridge.logrotate']);
-        // }
+        execFileSync('launchctl', ['bootout', 'system/matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] });
+        execFileSync('launchctl', ['bootout', 'system/matterbridge.logrotate'], { stdio: ['pipe', 'pipe', 'pipe'] });
     }
 
     pid(): string | null {
