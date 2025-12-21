@@ -11,8 +11,6 @@ export class MacPlatform extends PlatformCommands {
 
     install(args: string[]): void {
         this.checkRoot();
-        this.uninstall();
-
         const matterbridgeBinPath = this.checkMatterbridgeInstalled();
         const matterbridgeStoragePath = this.mkdirMatterbridgePaths();
         const matterbridgeLogPath = resolve(matterbridgeStoragePath, 'matterbridge.log');
