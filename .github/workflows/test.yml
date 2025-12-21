@@ -46,10 +46,12 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm link
-      - run: |
+      - name: "Test: mb-service -h"
+        run: |
           mb-service -h
           mb-service --help
-      - run: |
+      - name: "Test: mb-service -v"
+        run: |
           mb-service -v
           mb-service --version
       - run: |
@@ -60,20 +62,23 @@ jobs:
           test -w "$(npm prefix -g --silent)/lib/node_modules"
           ls -la "$(npm prefix -g --silent)/lib"
       - run: mb-service pid && launchctl print system/io.matterbridge
-      - run: sleep 10
+      - run: sleep 8
       - run: curl http://localhost:8283/
       - run: sudo mb-service uninstall
       - run: matterbridge -factoryreset
-      - run: sudo mb-service install --frontend 8383
-      - run: sleep 10
-      - run: curl http://localhost:8383/
-      - run: sudo mb-service uninstall
-      - run: matterbridge -factoryreset
-      - name: Log Rotation
+      - name: "Test: Custom Frontend Port"
+        run: |
+          sudo mb-service install --frontend 8383
+          sleep 8
+          curl http://localhost:8383/
+          sudo mb-service uninstall
+          matterbridge -factoryreset
+      - name: "Test: Log Rotation"
         run: |
           dd if=/dev/zero of=$HOME/.matterbridge/matterbridge.log bs=1M count=11
-          ls -la ~/.matterbridge
           sudo mb-service install
-          sleep 5
+          sleep 4
           ls -la ~/.matterbridge
-          test -f ~/.matterbridge/matterbridge.log.bakk
+          test -f ~/.matterbridge/matterbridge.log.bak
+          sudo mb-service uninstall
+          matterbridge -factoryreset
