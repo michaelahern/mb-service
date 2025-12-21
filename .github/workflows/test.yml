@@ -73,4 +73,5 @@ jobs:
           dd if=/dev/zero of=$HOME/.matterbridge/matterbridge.log bs=1M count=11
           ls -la ~/.matterbridge
           sudo mb-service install
+          sleep 5
           ls -la ~/.matterbridge
