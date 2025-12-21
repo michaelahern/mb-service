@@ -82,7 +82,7 @@ export class MacPlatform extends PlatformCommands {
             '<plist version="1.0">',
             '<dict>',
             '    <key>Label</key>',
-            `    <string>matterbridge-logrotate</string>`,
+            `    <string>matterbridge.logrotate</string>`,
             '    <key>ProgramArguments</key>',
             '    <array>',
             `         <string>/bin/sh</string>`,
