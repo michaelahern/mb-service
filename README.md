@@ -5,9 +5,9 @@
 [![downloads](https://badgen.net/npm/dt/mb-service)](https://www.npmjs.com/package/mb-service)
 [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/michaelahern/mb-service)
 
-A service management command-line utility for [Matterbridge](https://github.com/Luligu/matterbridge/), inspired by [Homebridge's](https://github.com/homebridge/homebridge-config-ui-x/wiki/Homebridge-Service-Command) `hb-service`.               
+A service management command-line utility for [Matterbridge](https://matterbridge.io/), inspired by [Homebridge's](https://github.com/homebridge/homebridge-config-ui-x/wiki/Homebridge-Service-Command) `hb-service`.               
 
-This command-line utility is primarily focused on supporting the macOS platform, as that is my primary platform at home, but it does have experimental support for Linux. The author of [Matterbridge](https://github.com/Luligu/matterbridge/) now has a dedicated utility for supporting Linux, [mb-service-linux](https://github.com/Luligu/mb-service-linux), which is a more mature option for Linux users.
+This command-line utility is primarily focused on supporting the macOS platform, as that is my primary platform at home, but it does have experimental support for Linux. The author of [Matterbridge](https://matterbridge.io/) now has a dedicated utility for supporting Linux, [mb-service-linux](https://github.com/Luligu/mb-service-linux), which is a more mature option for Linux users.
 
 ```shell
 % npm install -g matterbridge mb-service --omit=dev
@@ -44,15 +44,15 @@ Manage Matterbridge in your browser at:
 
 ## How This Project Uses `launchd` on macOS
 
-On macOS, `mb-service` manages the Matterbridge service using the native `launchd` system. It creates a Launch Daemon configuration file at `/Library/LaunchDaemons/com.matterbridge.plist`. This file tells `launchd` how to start, stop, and manage the Matterbridge process as a background service.
+On macOS, `mb-service` manages the Matterbridge service using the native `launchd` system. It creates a Launch Daemon configuration file at `/Library/LaunchDaemons/io.matterbridge.plist`. This file tells `launchd` how to start, stop, and manage the Matterbridge process as a background service.
 
 You can inspect the service status and configuration using:
 
 ```shell
-% launchctl print system/com.matterbridge
-system/com.matterbridge = {
+% launchctl print system/io.matterbridge
+system/io.matterbridge = {
     active count = 1
-    path = /Library/LaunchDaemons/com.matterbridge.plist
+    path = /Library/LaunchDaemons/io.matterbridge.plist
     type = LaunchDaemon
     state = running
 
@@ -72,7 +72,7 @@ system/com.matterbridge = {
     environment = {
         PATH => /opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin
         HOME => /Users/me
-        XPC_SERVICE_NAME => com.matterbridge
+        XPC_SERVICE_NAME => io.matterbridge
     }
 
     ...
