@@ -59,7 +59,7 @@ jobs:
       - run: |
           test -w "$(npm prefix -g --silent)/lib/node_modules"
           ls -la "$(npm prefix -g --silent)/lib"
-      - run: mb-service pid && launchctl print system/matterbridge
+      - run: mb-service pid && launchctl print system/io.matterbridge
       - run: sleep 10
       - run: curl http://localhost:8283/
       - run: sudo mb-service uninstall
