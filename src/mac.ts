@@ -6,12 +6,16 @@ import process from 'node:process';
 import { PlatformCommands } from './platform.js';
 
 export class MacPlatform extends PlatformCommands {
-    #plist = '/Library/LaunchDaemons/com.matterbridge.plist';
+    #plist = '/Library/LaunchDaemons/matterbridge.plist';
+    #plistLogrotate = '/Library/LaunchDaemons/matterbridge-logrotate.plist';
 
     install(args: string[]): void {
         this.checkRoot();
+        this.uninstall();
+
         const matterbridgeBinPath = this.checkMatterbridgeInstalled();
         const matterbridgeStoragePath = this.mkdirMatterbridgePaths();
+        const matterbridgeLogPath = resolve(matterbridgeStoragePath, 'matterbridge.log');
         const userInfo = this.getUserInfo();
 
         // Check NPM global modules path permissions and change if necessary
@@ -46,7 +50,7 @@ export class MacPlatform extends PlatformCommands {
             '<plist version="1.0">',
             '<dict>',
             '    <key>Label</key>',
-            `    <string>com.matterbridge</string>`,
+            `    <string>matterbridge</string>`,
             '    <key>ProgramArguments</key>',
             '    <array>',
             `         <string>${matterbridgeBinPath}</string>`,
@@ -66,14 +70,45 @@ export class MacPlatform extends PlatformCommands {
             `        <string>${process.env.PATH}</string>`,
             '    </dict>',
             '    <key>StandardOutPath</key>',
-            `    <string>${matterbridgeStoragePath}/matterbridge.log</string>`,
+            `    <string>${matterbridgeLogPath}</string>`,
             '    <key>StandardErrorPath</key>',
-            `    <string>${matterbridgeStoragePath}/matterbridge.log</string>`,
+            `    <string>${matterbridgeLogPath}</string>`,
+            '</dict>',
+            '</plist>'
+        ].filter(x => x).join('\n');
+
+        // Create the launchd plist file
+        const plistLogRotateFileContents = [
+            '<?xml version="1.0" encoding="UTF-8"?>',
+            '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
+            '<plist version="1.0">',
+            '<dict>',
+            '    <key>Label</key>',
+            `    <string>matterbridge-logrotate</string>`,
+            '    <key>ProgramArguments</key>',
+            '    <array>',
+            `         <string>/bin/sh</string>`,
+            `         <string>-c</string>`,
+            `         <string>if [ -f ${matterbridgeLogPath} ] &amp;&amp; [ $(stat -f%z ${matterbridgeLogPath}) -gt 10485760 ]; then cp ${matterbridgeLogPath} ${matterbridgeLogPath}.bak &amp;&amp; : &gt; ${matterbridgeLogPath}; fi</string>`,
+            '    </array>',
+            '    <key>RunAtLoad</key>',
+            '    <true/>',
+            '    <key>StartCalendarInterval</key>',
+            '    <dict>',
+            '        <key>Hour</key>',
+            '        <integer>1</integer>',
+            '        <key>Minute</key>',
+            '        <integer>30</integer>',
+            '    </dict>',
+            '    <key>UserName</key>',
+            `    <string>${userInfo.username}</string>`,
             '</dict>',
             '</plist>'
         ].filter(x => x).join('\n');
 
         writeFileSync(this.#plist, plistFileContents);
+        writeFileSync(this.#plistLogrotate, plistLogRotateFileContents);
+
         console.info('Matterbridge Service Installed!');
         this.start();
         this.postinstall(args);
@@ -85,6 +120,10 @@ export class MacPlatform extends PlatformCommands {
 
         if (existsSync(this.#plist)) {
             unlinkSync(this.#plist);
+        }
+
+        if (existsSync(this.#plistLogrotate)) {
+            unlinkSync(this.#plistLogrotate);
         }
 
         console.info('Matterbridge Service Uninstalled!');
@@ -100,6 +139,7 @@ export class MacPlatform extends PlatformCommands {
         }
 
         console.info('Starting Matterbridge Service...');
+        execFileSync('launchctl', ['bootstrap', 'system', this.#plistLogrotate]);
         execFileSync('launchctl', ['bootstrap', 'system', this.#plist]);
     }
 
@@ -109,13 +149,13 @@ export class MacPlatform extends PlatformCommands {
 
         if (this.pid()) {
             console.info('Stopping Matterbridge Service...');
-            execFileSync('launchctl', ['bootout', 'system/com.matterbridge']);
+            execFileSync('launchctl', ['bootout', 'system/matterbridge']);
         }
     }
 
     pid(): string | null {
         try {
-            const output = execFileSync('launchctl', ['print', 'system/com.matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
+            const output = execFileSync('launchctl', ['print', 'system/matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] }).toString();
             const match = output.match(/pid = (\d+)/);
             if (match && match[1]) {
                 return match[1];
