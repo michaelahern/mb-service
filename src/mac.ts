@@ -87,7 +87,7 @@ export class MacPlatform extends PlatformCommands {
             '    <array>',
             `        <string>/bin/sh</string>`,
             `        <string>-c</string>`,
-            `        <string>if [ -f ${matterbridgeLogPath} ] &amp;&amp; [ $(stat -f%z ${matterbridgeLogPath}) -gt 10485760 ]; then cp ${matterbridgeLogPath} ${matterbridgeLogPath}.bak &amp;&amp; : &gt; ${matterbridgeLogPath}; fi</string>`,
+            `        <string>if [ -f ${matterbridgeLogPath} ] &amp;&amp; [ $(stat -f%z ${matterbridgeLogPath}) -gt 10485760 ]; then cp ${matterbridgeLogPath} ${matterbridgeLogPath}.0 &amp;&amp; : &gt; ${matterbridgeLogPath}; fi</string>`,
             '    </array>',
             '    <key>RunAtLoad</key>',
             '    <true/>',

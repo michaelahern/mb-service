@@ -79,6 +79,6 @@ jobs:
           sudo mb-service install
           sleep 4
           ls -la ~/.matterbridge
-          test -f ~/.matterbridge/matterbridge.log.bak
+          test -f ~/.matterbridge/matterbridge.log.0
           sudo mb-service uninstall
           matterbridge -factoryreset
