@@ -68,8 +68,9 @@ jobs:
       - run: sleep 10
       - run: curl http://localhost:8383/
       - run: sudo mb-service uninstall
+      - run: matterbridge -factoryreset
       - run: |
+          dd if=/dev/zero of=$HOME/.matterbridge/matterbridge.log bs=1M count=11
           ls -la ~/.matterbridge
-          dd if=/dev/zero of=test.log bs=1M count=11
           sudo mb-service install
           ls -la ~/.matterbridge
