@@ -134,14 +134,23 @@ export class MacPlatform extends PlatformCommands {
         console.info('Starting Matterbridge Service...');
 
         try {
-            execFileSync('launchctl', ['bootstrap', 'system', this.#plistDaemon]);
+            // TODO: Check if Bootstrapped First!
+            execFileSync('launchctl', ['bootstrap', 'system', this.#plistLogRotate], { stdio: ['pipe', 'pipe', 'pipe'] });
         }
         catch (error) {
-            console.error('Failed to start Matterbridge Service!');
-            console.error(error);
-            process.exit(1);
+            if (error instanceof Error) {
+                console.debug('Error Starting Matterbridge Log Rotation Service!');
+                console.debug(error.message);
+            }
         }
-        execFileSync('launchctl', ['bootstrap', 'system', this.#plistLogRotate]);
+
+        try {
+            // TODO: Check if Bootstrapped First!
+            execFileSync('launchctl', ['bootstrap', 'system', this.#plistDaemon], { stdio: ['inherit', 'inherit', 'inherit'] });
+        }
+        catch {
+            console.error('Error Starting Matterbridge Service!');
+        }
     }
 
     stop(): void {
@@ -149,8 +158,22 @@ export class MacPlatform extends PlatformCommands {
         this.#checkServiceInstalled();
 
         console.info('Stopping Matterbridge Service...');
-        execFileSync('launchctl', ['bootout', 'system/io.matterbridge'], { stdio: ['pipe', 'pipe', 'pipe'] });
-        execFileSync('launchctl', ['bootout', 'system/io.matterbridge.logrotate'], { stdio: ['pipe', 'pipe', 'pipe'] });
+
+        try {
+            // TODO: Check if Bootstrapped First!
+            execFileSync('launchctl', ['bootout', 'system/io.matterbridge'], { stdio: ['inherit', 'inherit', 'inherit'] });
+        }
+        catch {
+            console.error('Error Stopping Matterbridge Service!');
+        }
+
+        try {
+            // TODO: Check if Bootstrapped First!
+            execFileSync('launchctl', ['bootout', 'system/io.matterbridge.logrotate'], { stdio: ['pipe', 'pipe', 'pipe'] });
+        }
+        catch {
+            return;
+        }
     }
 
     pid(): string | null {
@@ -169,7 +192,7 @@ export class MacPlatform extends PlatformCommands {
 
     tail(): void {
         const matterbridgeStoragePath = resolve(this.getUserInfo().homedir, '.matterbridge');
-        execFileSync('tail', ['-f', '-n', '32', `${matterbridgeStoragePath}/matterbridge.log`], { stdio: 'inherit' });
+        execFileSync('tail', ['-f', '-n', '32', `${matterbridgeStoragePath}/matterbridge.log`], { stdio: ['inherit', 'inherit', 'inherit'] });
     }
 
     #checkServiceInstalled(): void {
