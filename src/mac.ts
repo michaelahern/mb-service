@@ -6,8 +6,8 @@ import process from 'node:process';
 import { PlatformCommands } from './platform.js';
 
 export class MacPlatform extends PlatformCommands {
-    #plist = '/Library/LaunchDaemons/matterbridge.plist';
-    #plistLogrotate = '/Library/LaunchDaemons/matterbridge-logrotate.plist';
+    #plist = '/Library/LaunchDaemons/io.matterbridge.plist';
+    #plistLogrotate = '/Library/LaunchDaemons/io.matterbridge.logrotate.plist';
 
     install(args: string[]): void {
         this.checkRoot();
@@ -145,10 +145,11 @@ export class MacPlatform extends PlatformCommands {
         this.checkRoot();
         this.#checkServiceInstalled();
 
-        if (this.pid()) {
-            console.info('Stopping Matterbridge Service...');
-            execFileSync('launchctl', ['bootout', 'system/matterbridge']);
-        }
+        // if (this.pid()) {
+        console.info('Stopping Matterbridge Service...');
+        execFileSync('launchctl', ['bootout', 'system/matterbridge']);
+        execFileSync('launchctl', ['bootout', 'system/matterbridge.logrotate']);
+        // }
     }
 
     pid(): string | null {
@@ -172,5 +173,6 @@ export class MacPlatform extends PlatformCommands {
 
     #checkServiceInstalled(): void {
         super.checkServiceInstalled(this.#plist);
+        super.checkServiceInstalled(this.#plistLogrotate);
     }
 }
