@@ -7,7 +7,7 @@ import { PlatformCommands } from './platform.js';
 
 export class MacPlatform extends PlatformCommands {
     #plistDaemon = '/Library/LaunchDaemons/io.matterbridge.plist';
-    #plistLogrotate = '/Library/LaunchDaemons/io.matterbridge.logrotate.plist';
+    #plistLogRotate = '/Library/LaunchDaemons/io.matterbridge.logrotate.plist';
 
     install(args: string[]): void {
         this.checkRoot();
@@ -100,7 +100,7 @@ export class MacPlatform extends PlatformCommands {
         ].filter(x => x).join('\n');
 
         writeFileSync(this.#plistDaemon, plistDaemonFileContents);
-        writeFileSync(this.#plistLogrotate, plistLogRotateFileContents);
+        writeFileSync(this.#plistLogRotate, plistLogRotateFileContents);
 
         console.info('Matterbridge Service Installed!');
         this.start();
@@ -115,8 +115,8 @@ export class MacPlatform extends PlatformCommands {
             unlinkSync(this.#plistDaemon);
         }
 
-        if (existsSync(this.#plistLogrotate)) {
-            unlinkSync(this.#plistLogrotate);
+        if (existsSync(this.#plistLogRotate)) {
+            unlinkSync(this.#plistLogRotate);
         }
 
         console.info('Matterbridge Service Uninstalled!');
@@ -132,7 +132,7 @@ export class MacPlatform extends PlatformCommands {
         }
 
         console.info('Starting Matterbridge Service...');
-        execFileSync('launchctl', ['bootstrap', 'system', this.#plistLogrotate]);
+        execFileSync('launchctl', ['bootstrap', 'system', this.#plistLogRotate]);
         execFileSync('launchctl', ['bootstrap', 'system', this.#plistDaemon]);
     }
 
